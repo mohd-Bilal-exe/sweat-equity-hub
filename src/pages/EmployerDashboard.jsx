@@ -1,0 +1,181 @@
+import React, { useState, useEffect } from "react";
+import { User } from "@/api/entities";
+import { Job } from "@/api/entities";
+import { Payment } from "@/api/entities";
+import { Application } from "@/api/entities";
+import { Link } from "react-router-dom";
+import { createPageUrl } from "@/utils";
+import { Card, CardHeader, CardContent, CardTitle, CardDescription } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
+import JobList from "../components/employer/JobList";
+import PaymentHistory from "../components/employer/PaymentHistory";
+import EmployerDashboardStats from "../components/employer/DashboardStats";
+
+export default function EmployerDashboard() {
+  const [user, setUser] = useState(null);
+  const [jobs, setJobs] = useState([]);
+  const [payments, setPayments] = useState([]);
+  const [applications, setApplications] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    setIsLoading(true);
+    try {
+      const currentUser = await User.me();
+      setUser(currentUser);
+      const [userJobs, userPayments, userApplications] = await Promise.all([
+        Job.filter({ created_by: currentUser.email }, "-created_date"),
+        Payment.filter({ employer_id: currentUser.id }, "-created_date"),
+        Application.filter({ employer_id: currentUser.id }, "-created_date"),
+      ]);
+      setJobs(userJobs);
+      setPayments(userPayments);
+      setApplications(userApplications);
+    } catch (error) {
+      console.error("User not signed in, showing demo data");
+      // Show demo data when not signed in
+      setUser(null);
+      setJobs([
+        {
+          id: "demo1",
+          title: "Senior React Developer",
+          company_name: "Demo Company",
+          is_active: true,
+          created_date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString()
+        },
+        {
+          id: "demo2", 
+          title: "UX Designer",
+          company_name: "Demo Company",
+          is_active: true,
+          created_date: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString()
+        }
+      ]);
+      setApplications([
+        {
+          id: "app1",
+          job_id: "demo1",
+          job_title: "Senior React Developer",
+          applicant_name: "John Smith",
+          status: "interview",
+          created_date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString()
+        },
+        {
+          id: "app2",
+          job_id: "demo1", 
+          job_title: "Senior React Developer",
+          applicant_name: "Sarah Johnson",
+          status: "viewed",
+          created_date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString()
+        },
+        {
+          id: "app3",
+          job_id: "demo2",
+          job_title: "UX Designer", 
+          applicant_name: "Mike Chen",
+          status: "submitted",
+          created_date: new Date().toISOString()
+        }
+      ]);
+      setPayments([
+        {
+          id: "pay1",
+          job_title: "Senior React Developer",
+          amount: 20,
+          currency: "USD",
+          status: "completed",
+          transaction_id: "txn_demo123",
+          created_date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString()
+        }
+      ]);
+    }
+    setIsLoading(false);
+  };
+  
+  const deleteJob = async (jobId) => {
+    if (!user) {
+      alert("Sign in to manage jobs");
+      return;
+    }
+    if(confirm('Are you sure you want to delete this job posting?')){
+      try {
+        await Job.delete(jobId);
+        fetchData();
+      } catch(e) {
+        alert('Failed to delete job.');
+      }
+    }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen bg-gray-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Employer Dashboard</h1>
+            <p className="text-gray-600">
+              {user ? "Manage your job postings and view payments." : "Demo view - Sign in to manage your actual job postings."}
+            </p>
+          </div>
+          <Button asChild>
+            <Link to={createPageUrl('PostJob')}>
+              <Plus className="w-4 h-4 mr-2"/>
+              Post New Job
+            </Link>
+          </Button>
+        </div>
+        
+        <EmployerDashboardStats jobs={jobs} applications={applications} />
+
+        <Tabs defaultValue="jobs">
+          <TabsList className="mb-4">
+            <TabsTrigger value="jobs">Manage Jobs</TabsTrigger>
+            <TabsTrigger value="payments">Payment History</TabsTrigger>
+          </TabsList>
+          <TabsContent value="jobs">
+            <JobList jobs={jobs} deleteJob={deleteJob} />
+            {!user && (
+              <Card className="mt-6 border-blue-200 bg-blue-50">
+                <CardContent className="p-6 text-center">
+                  <h3 className="text-lg font-semibold text-blue-900 mb-2">This is a Demo View</h3>
+                  <p className="text-blue-700 mb-4">Sign in to post and manage your actual job listings.</p>
+                  <Button asChild>
+                    <Link to={createPageUrl("Home")}>Sign In to Get Started</Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+          <TabsContent value="payments">
+            <PaymentHistory payments={payments} />
+            {!user && (
+              <Card className="mt-6 border-blue-200 bg-blue-50">
+                <CardContent className="p-6 text-center">
+                  <h3 className="text-lg font-semibold text-blue-900 mb-2">This is a Demo View</h3>
+                  <p className="text-blue-700 mb-4">Sign in to view your actual payment history.</p>
+                  <Button asChild>
+                    <Link to={createPageUrl("Home")}>Sign In to Get Started</Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+        </Tabs>
+      </div>
+    </div>
+  );
+}
