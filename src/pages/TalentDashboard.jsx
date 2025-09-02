@@ -28,30 +28,7 @@ export default function TalentDashboard() {
         // Show demo data when not signed in
         setUser(null);
         setApplications([
-          {
-            id: "demo1",
-            job_title: "Senior Frontend Engineer",
-            company_name: "Innovate Inc.",
-            job_id: "job1",
-            status: "interview",
-            created_date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
-          },
-          {
-            id: "demo2", 
-            job_title: "Lead Product Designer",
-            company_name: "Creative Labs",
-            job_id: "job2",
-            status: "viewed",
-            created_date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString()
-          },
-          {
-            id: "demo3",
-            job_title: "Growth Marketing Manager", 
-            company_name: "ScaleUp",
-            job_id: "job3",
-            status: "submitted",
-            created_date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString()
-          }
+          
         ]);
       }
       setIsLoading(false);

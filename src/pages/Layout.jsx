@@ -80,11 +80,11 @@ export default function Layout({ children, currentPageName }) {
               {navItems.map((item) => (
                 <Link
                   key={item.name}
-                  to={item.href}
+                  to={!user?"/home":item.href}
                   className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
-                    location.pathname === item.href
+                    location.pathname === item.href 
                       ? "bg-gray-100 text-gray-900"
-                      : "text-gray-500 hover:text-gray-900 hover:bg-gray-100"
+                      : `text-gray-500 ${user ?"hover:text-gray-900 hover:bg-gray-100 ": "cursor-not-allowed"}`
                   }`}
                 >
                   <item.icon className="w-4 h-4" />

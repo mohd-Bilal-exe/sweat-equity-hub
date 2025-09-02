@@ -29,7 +29,19 @@ export default function Home() {
     equityRange: 0
   });
   const [isLoading, setIsLoading] = useState(true);
+const [currentPage, setCurrentPage] = useState(1);
+const jobsPerPage = 10;
+const indexOfLastJob = currentPage * jobsPerPage;
+const indexOfFirstJob = indexOfLastJob - jobsPerPage;
+const currentJobs = filteredJobs.slice(indexOfFirstJob, indexOfLastJob);
+const totalPages = Math.ceil(filteredJobs.length / jobsPerPage);
 
+const handlePageChange = (page) => {
+  if (page >= 1 && page <= totalPages) {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+};
   useEffect(() => {
     loadJobs();
     checkAuth();
@@ -213,12 +225,37 @@ export default function Home() {
                 Clear Filters
               </Button>
             </div>
-          ) : (
+          ) : (<>
             <div className="space-y-6">
               {filteredJobs.map((job) => (
                 <JobCard key={job.id} job={job} user={user} />
               ))}
             </div>
+            <div className="flex justify-center space-x-2 mt-10">
+              <Button
+                variant="outline"
+                disabled={currentPage === 1}
+                onClick={() => handlePageChange(currentPage - 1)}
+              >
+                Previous
+              </Button>
+              {[...Array(totalPages)].map((_, i) => (
+                <Button
+                  key={i}
+                  variant={currentPage === i + 1 ? "default" : "outline"}
+                  onClick={() => handlePageChange(i + 1)}
+                >
+                  {i + 1}
+                </Button>
+              ))}
+              <Button
+                variant="outline"
+                disabled={currentPage === totalPages}
+                onClick={() => handlePageChange(currentPage + 1)}
+              >
+                Next
+              </Button>
+            </div></>
           )}
         </div>
       </section>

@@ -42,46 +42,9 @@ export default function EmployerDashboard() {
       // Show demo data when not signed in
       setUser(null);
       setJobs([
-        {
-          id: "demo1",
-          title: "Senior React Developer",
-          company_name: "Demo Company",
-          is_active: true,
-          created_date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString()
-        },
-        {
-          id: "demo2", 
-          title: "UX Designer",
-          company_name: "Demo Company",
-          is_active: true,
-          created_date: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString()
-        }
       ]);
       setApplications([
-        {
-          id: "app1",
-          job_id: "demo1",
-          job_title: "Senior React Developer",
-          applicant_name: "John Smith",
-          status: "interview",
-          created_date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString()
-        },
-        {
-          id: "app2",
-          job_id: "demo1", 
-          job_title: "Senior React Developer",
-          applicant_name: "Sarah Johnson",
-          status: "viewed",
-          created_date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString()
-        },
-        {
-          id: "app3",
-          job_id: "demo2",
-          job_title: "UX Designer", 
-          applicant_name: "Mike Chen",
-          status: "submitted",
-          created_date: new Date().toISOString()
-        }
+        
       ]);
       setPayments([
         {
