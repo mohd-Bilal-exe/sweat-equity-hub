@@ -199,13 +199,13 @@ export default function Layout({ children, currentPageName }) {
       </main>
 
       {/* Footer */}
-      <footer className="bg-gray-900 py-12 text-white">
-        <div className="mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+      <footer className="bg-gray-900 py-6 text-white">
+        <div className="flex flex-col justify-between mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
           <div className="flex md:flex-row flex-col justify-between items-center mb-8">
             {/* Logo */}
             <div className="flex items-center space-x-2">
               <div className="flex justify-center items-center bg-white rounded-lg w-8 h-8">
-                <Sparkles className="w-5 h-5 text-gray-900" />
+                <img data-filename="layout" data-linenumber="74" data-visual-selector-id="layout74" data-source-location="layout:74:14" data-dynamic-content="false" src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/395488b87_WhatsAppImage2025-07-16at203313_d8522d69.jpg" alt="sweatquity logo" class="w-8 h-8 object-contain" className="rounded-xl"/>
               </div>
               <span className="font-bold text-xl">sweatquity</span>
             </div>
@@ -230,7 +230,7 @@ export default function Layout({ children, currentPageName }) {
             </div>
           </div>
           
-          <div className="pt-8 border-gray-800 border-t text-center">
+          <div className="mt- pt-6 border-gray-800 border-t text-center">
             <p className="text-gray-400 text-sm">
               © 2025 sweatquity. All rights reserved.
             </p>
