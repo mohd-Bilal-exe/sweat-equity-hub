@@ -64,13 +64,13 @@ export default function Layout({ children, currentPageName }) {
   return (
     <div className="bg-white min-h-screen text-gray-800">
       {/* Navigation */}
-      <nav className="top-0 z-50 sticky bg-white/80 backdrop-blur-lg border-b">
+      <nav className="top-0 z-50 sticky bg-white/40 backdrop-blur-lg border-b">
         <div className="mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
             <Link to={createPageUrl("Home")} className="flex items-center space-x-2">
-              <div className="flex justify-center items-center bg-gray-900 rounded-lg w-8 h-8">
-                <img data-filename="layout" data-linenumber="74" data-visual-selector-id="layout74" data-source-location="layout:74:14" data-dynamic-content="false" src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/395488b87_WhatsAppImage2025-07-16at203313_d8522d69.jpg" alt="sweatquity logo" class="w-8 h-8 object-contain"/>
+              <div className="flex justify-center items-center rounded-lg w-8 h-8">
+                <img src="/logoDark.jpg" className="rounded-xl overflow-hidden"/>
               </div>
               <span className="font-bold text-gray-900 text-xl">sweatquity</span>
             </Link>
@@ -205,7 +205,7 @@ export default function Layout({ children, currentPageName }) {
             {/* Logo */}
             <div className="flex items-center space-x-2">
               <div className="flex justify-center items-center bg-white rounded-lg w-8 h-8">
-                <img data-filename="layout" data-linenumber="74" data-visual-selector-id="layout74" data-source-location="layout:74:14" data-dynamic-content="false" src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/395488b87_WhatsAppImage2025-07-16at203313_d8522d69.jpg" alt="sweatquity logo" class="w-8 h-8 object-contain" className="rounded-xl"/>
+                <img src="/logoDark.jpg" className="rounded-xl overflow-hidden"/>
               </div>
               <span className="font-bold text-xl">sweatquity</span>
             </div>
