@@ -62,7 +62,7 @@ export default function Layout({ children, currentPageName }) {
   ];
 
   return (
-    <div className="bg-white min-h-screen text-gray-800">
+    <div className="flex flex-col justify-between bg-white min-h-screen text-gray-800">
       {/* Navigation */}
       <nav className="top-0 z-50 sticky bg-white/40 backdrop-blur-lg border-b">
         <div className="mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">

@@ -69,19 +69,19 @@ export default function TalentDashboard() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-screen bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+      <div className="flex justify-center items-center bg-gray-50 h-screen">
+        <div className="border-gray-900 border-b-2 rounded-full w-12 h-12 animate-spin"></div>
       </div>
     );
   }
 
   return (
-    <div className="bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="bg-gray-50 px-4 sm:px-6 lg:px-8 py-8">
+      <div className="mx-auto max-w-7xl">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Talent Dashboard</h1>
+          <h1 className="font-bold text-gray-900 text-3xl">Talent Dashboard</h1>
           <p className="text-gray-600">
-            {user ? "Track the status of all your job applications." : "Demo view - Sign in to see your actual applications."}
+            {user ? "Track the status of all your job applications." : "Sign in to see your actual applications."}
           </p>
         </div>
         
@@ -116,7 +116,7 @@ export default function TalentDashboard() {
                         <TableCell>{format(new Date(app.created_date), "MMM d, yyyy")}</TableCell>
                         <TableCell>
                           <Badge className={statusInfo.color}>
-                            <statusInfo.icon className="w-3 h-3 mr-1.5" />
+                            <statusInfo.icon className="mr-1.5 w-3 h-3" />
                             {statusInfo.text}
                           </Badge>
                         </TableCell>
@@ -130,7 +130,7 @@ export default function TalentDashboard() {
                   })
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center h-24">
+                    <TableCell colSpan={5} className="h-24 text-center">
                       You haven't applied to any jobs yet.
                     </TableCell>
                   </TableRow>
@@ -141,10 +141,10 @@ export default function TalentDashboard() {
         </Card>
         
         {!user && (
-          <Card className="mt-8 border-blue-200 bg-blue-50">
+          <Card className="bg-blue-50 mt-8 border-blue-200">
             <CardContent className="p-6 text-center">
-              <h3 className="text-lg font-semibold text-blue-900 mb-2">This is a Demo View</h3>
-              <p className="text-blue-700 mb-4">Sign in to see your actual job applications and track their progress.</p>
+              <h3 className="mb-2 font-semibold text-blue-900 text-lg">This is a Demo View</h3>
+              <p className="mb-4 text-blue-700">Sign in to see your actual job applications and track their progress.</p>
               <Button asChild>
                 <Link to={createPageUrl("Home")}>Sign In to Get Started</Link>
               </Button>

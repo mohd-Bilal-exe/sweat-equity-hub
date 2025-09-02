@@ -115,25 +115,25 @@ export default function EmployerDashboard() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-screen bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+      <div className="flex justify-center items-center bg-gray-50 h-screen">
+        <div className="border-gray-900 border-b-2 rounded-full w-12 h-12 animate-spin"></div>
       </div>
     );
   }
 
   return (
-    <div className="bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+    <div className="bg-gray-50 px-4 sm:px-6 lg:px-8 py-8">
+      <div className="mx-auto max-w-7xl">
+        <div className="flex sm:flex-row flex-col justify-between items-start sm:items-center gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Employer Dashboard</h1>
+            <h1 className="font-bold text-gray-900 text-3xl">Employer Dashboard</h1>
             <p className="text-gray-600">
               {user ? "Manage your job postings and view payments." : "Demo view - Sign in to manage your actual job postings."}
             </p>
           </div>
           <Button asChild>
             <Link to={createPageUrl('PostJob')}>
-              <Plus className="w-4 h-4 mr-2"/>
+              <Plus className="mr-2 w-4 h-4"/>
               Post New Job
             </Link>
           </Button>
@@ -149,10 +149,10 @@ export default function EmployerDashboard() {
           <TabsContent value="jobs">
             <JobList jobs={jobs} deleteJob={deleteJob} />
             {!user && (
-              <Card className="mt-6 border-blue-200 bg-blue-50">
+              <Card className="bg-blue-50 mt-6 border-blue-200">
                 <CardContent className="p-6 text-center">
-                  <h3 className="text-lg font-semibold text-blue-900 mb-2">This is a Demo View</h3>
-                  <p className="text-blue-700 mb-4">Sign in to post and manage your actual job listings.</p>
+                  <h3 className="mb-2 font-semibold text-blue-900 text-lg">This is a Demo View</h3>
+                  <p className="mb-4 text-blue-700">Sign in to post and manage your actual job listings.</p>
                   <Button asChild>
                     <Link to={createPageUrl("Home")}>Sign In to Get Started</Link>
                   </Button>
@@ -163,10 +163,10 @@ export default function EmployerDashboard() {
           <TabsContent value="payments">
             <PaymentHistory payments={payments} />
             {!user && (
-              <Card className="mt-6 border-blue-200 bg-blue-50">
+              <Card className="bg-blue-50 mt-6 border-blue-200">
                 <CardContent className="p-6 text-center">
-                  <h3 className="text-lg font-semibold text-blue-900 mb-2">This is a Demo View</h3>
-                  <p className="text-blue-700 mb-4">Sign in to view your actual payment history.</p>
+                  <h3 className="mb-2 font-semibold text-blue-900 text-lg">This is a Demo View</h3>
+                  <p className="mb-4 text-blue-700">Sign in to view your actual payment history.</p>
                   <Button asChild>
                     <Link to={createPageUrl("Home")}>Sign In to Get Started</Link>
                   </Button>
