@@ -119,33 +119,33 @@ export default function Home() {
   const uniqueLocations = [...new Set(jobs.map(job => job.location))].filter(Boolean);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="bg-white min-h-screen">
       {/* Hero Section */}
-      <section className="relative py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="p-8 md:p-12 mb-6">
-            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
+      <section className="relative px-4 sm:px-6 lg:px-8 py-12">
+        <div className="mx-auto max-w-4xl text-center">
+          <div className="mb-6 p-8 md:p-12">
+            <h1 className="mb-6 font-bold text-gray-900 text-4xl md:text-6xl">
               Find Your Dream
-              <span className="block bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">Startup Job</span>
+              <span className="block bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600 text-transparent">Startup Job</span>
             </h1>
-            <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-              Connect with innovative startups offering equity compensation. Your next career move could be your biggest investment.
+            <p className="mx-auto mb-8 max-w-2xl text-gray-600 text-xl">
+              Where your skills earn ownership, not just a salary.
             </p>
 
             {/* Search Bar */}
-            <div className="bg-white border rounded-xl p-4 max-w-2xl mx-auto shadow-sm">
-              <div className="flex flex-col md:flex-row gap-4">
-                <div className="flex-1 relative">
-                  <Search className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+            <div className="bg-white shadow-sm mx-auto p-4 border rounded-xl max-w-2xl">
+              <div className="flex md:flex-row flex-col gap-4">
+                <div className="relative flex-1">
+                  <Search className="top-3 left-3 absolute w-5 h-5 text-gray-400" />
                   <Input
                     placeholder="Search jobs, companies, or skills..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 bg-gray-50 border-gray-200"
+                    className="bg-gray-50 pl-10 border-gray-200"
                   />
                 </div>
                 <Button>
-                  <Search className="w-4 h-4 mr-2" />
+                  <Search className="mr-2 w-4 h-4" />
                   Search
                 </Button>
               </div>
@@ -156,7 +156,7 @@ export default function Home() {
 
       {/* Filters and Jobs Section */}
       <section className="px-4 sm:px-6 lg:px-8 pb-20">
-        <div className="max-w-4xl mx-auto">
+        <div className="mx-auto max-w-4xl">
           {/* Filters */}
           <SearchFilters
             filters={filters}
@@ -165,8 +165,8 @@ export default function Home() {
           />
 
           {/* Jobs List */}
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-2xl font-bold text-gray-800">
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="font-bold text-gray-800 text-2xl">
               {filteredJobs.length} Jobs Available
             </h2>
             <div className="flex items-center space-x-2 text-gray-500">
@@ -178,25 +178,25 @@ export default function Home() {
           {isLoading ? (
             <div className="space-y-6">
               {[...Array(3)].map((_, i) => (
-                <div key={i} className="bg-white border rounded-lg p-6 animate-pulse">
+                <div key={i} className="bg-white p-6 border rounded-lg animate-pulse">
                   <div className="flex gap-6">
-                    <div className="w-16 h-16 bg-gray-200 rounded-lg"></div>
+                    <div className="bg-gray-200 rounded-lg w-16 h-16"></div>
                     <div className="flex-1 space-y-3">
-                      <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                      <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-                      <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+                      <div className="bg-gray-200 rounded w-3/4 h-4"></div>
+                      <div className="bg-gray-200 rounded w-1/2 h-3"></div>
+                      <div className="bg-gray-200 rounded w-2/3 h-3"></div>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
           ) : filteredJobs.length === 0 ? (
-            <div className="bg-white border rounded-lg p-12 text-center">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <div className="bg-white p-12 border rounded-lg text-center">
+              <div className="flex justify-center items-center bg-gray-100 mx-auto mb-6 rounded-full w-16 h-16">
                 <Search className="w-8 h-8 text-gray-500" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-800 mb-2">No jobs found</h3>
-              <p className="text-gray-500 mb-6">Try adjusting your search criteria or check back later.</p>
+              <h3 className="mb-2 font-semibold text-gray-800 text-xl">No jobs found</h3>
+              <p className="mb-6 text-gray-500">Try adjusting your search criteria or check back later.</p>
               <Button
                 onClick={() => {
                   setSearchTerm("");
