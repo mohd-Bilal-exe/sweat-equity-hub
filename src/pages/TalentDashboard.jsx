@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { User } from '@/api/entities';
-import { Application } from '@/api/entities';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Card, CardHeader, CardContent, CardTitle, CardDescription } from '@/components/ui/card';

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { User } from '@/api/entities';
 import TalentProfileForm from '../components/profile/TalentProfileForm';
 import EmployerProfileForm from '../components/profile/EmployerProfileForm';
 import { Button } from '@/components/ui/button';

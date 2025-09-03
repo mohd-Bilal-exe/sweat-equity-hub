@@ -1,6 +1,4 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { User } from '@/api/entities';
-import { Job } from '@/api/entities';
 import { useNavigate, Link, useSearchParams, useParams } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';

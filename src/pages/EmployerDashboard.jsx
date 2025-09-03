@@ -1,8 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { User } from '@/api/entities';
-import { Job } from '@/api/entities';
-import { Payment } from '@/api/entities';
-import { Application } from '@/api/entities';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Card, CardHeader, CardContent, CardTitle, CardDescription } from '@/components/ui/card';
@@ -41,18 +37,20 @@ export default function EmployerDashboard() {
       );
       setJobs(userJobs.filter(Boolean));
 
-      const userPayments = user.payments?.length > 0
-        ? await Promise.all(
-            user.payments.map(ref => (ref ? firebaseServices.getDocument(ref) : null))
-          )
-        : [];
+      const userPayments =
+        user.payments?.length > 0
+          ? await Promise.all(
+              user.payments.map(ref => (ref ? firebaseServices.getDocument(ref) : null))
+            )
+          : [];
       setPayments(userPayments.filter(Boolean));
 
-      const userApplications = user.applications?.length > 0
-        ? await Promise.all(
-            user.applications.map(ref => (ref ? firebaseServices.getDocument(ref) : null))
-          )
-        : [];
+      const userApplications =
+        user.applications?.length > 0
+          ? await Promise.all(
+              user.applications.map(ref => (ref ? firebaseServices.getDocument(ref) : null))
+            )
+          : [];
       setApplications(userApplications.filter(Boolean));
     } catch (error) {
       console.error('Error fetching data:', error);

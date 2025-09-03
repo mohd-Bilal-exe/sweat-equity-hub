@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-import { User } from '@/api/entities';
-import { UploadFile } from '@/api/integrations';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';

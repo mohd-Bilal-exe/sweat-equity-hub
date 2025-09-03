@@ -1,49 +1,42 @@
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
+import { MapPin, Clock, Search } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
 
-import React, { useState, useEffect } from "react";
-import { Job } from "@/api/entities";
-import { User } from "@/api/entities";
-import { Link } from "react-router-dom";
-import { createPageUrl } from "@/utils";
-import {
-  MapPin,
-  Clock,
-  Search,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-
-import JobCard from "../components/home/JobCard";
-import SearchFilters from "../components/home/SearchFilters";
-import { firebaseServices } from "@/api/firebase/services";
-import useUserStore from "@/api/zustand";
+import JobCard from '../components/home/JobCard';
+import SearchFilters from '../components/home/SearchFilters';
+import { firebaseServices } from '@/api/firebase/services';
+import useUserStore from '@/api/zustand';
 
 export default function Home() {
   const [jobs, setJobs] = useState([]);
   const [filteredJobs, setFilteredJobs] = useState([]);
   const { user } = useUserStore();
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState({
     categories: [],
     remoteTypes: [],
     locations: [],
     salaryRanges: [],
-    equityRange: 0
+    equityRange: 0,
   });
   const [isLoading, setIsLoading] = useState(true);
-const [currentPage, setCurrentPage] = useState(1);
-const jobsPerPage = 10;
-const indexOfLastJob = currentPage * jobsPerPage;
-const indexOfFirstJob = indexOfLastJob - jobsPerPage;
-const currentJobs = filteredJobs.slice(indexOfFirstJob, indexOfLastJob);
-const totalPages = Math.ceil(filteredJobs.length / jobsPerPage);
+  const [currentPage, setCurrentPage] = useState(1);
+  const jobsPerPage = 10;
+  const indexOfLastJob = currentPage * jobsPerPage;
+  const indexOfFirstJob = indexOfLastJob - jobsPerPage;
+  const currentJobs = filteredJobs.slice(indexOfFirstJob, indexOfLastJob);
+  const totalPages = Math.ceil(filteredJobs.length / jobsPerPage);
 
-const handlePageChange = (page) => {
-  if (page >= 1 && page <= totalPages) {
-    setCurrentPage(page);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-};
+  const handlePageChange = page => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
   useEffect(() => {
     loadJobs();
   }, []);
@@ -58,7 +51,7 @@ const handlePageChange = (page) => {
       const activeJobs = jobData.filter(job => job.is_active);
       setJobs(activeJobs);
     } catch (error) {
-      console.error("Error loading jobs:", error);
+      console.error('Error loading jobs:', error);
     }
     setIsLoading(false);
   };
@@ -67,10 +60,11 @@ const handlePageChange = (page) => {
     let filtered = jobs;
 
     if (searchTerm) {
-      filtered = filtered.filter(job =>
-        job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        job.company_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        job.description.toLowerCase().includes(searchTerm.toLowerCase())
+      filtered = filtered.filter(
+        job =>
+          job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          job.company_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          job.description.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
@@ -90,9 +84,14 @@ const handlePageChange = (page) => {
       filtered = filtered.filter(job => {
         return filters.salaryRanges.some(range => {
           // Handle "Equity Only" filter
-          if (range === "equity") {
-            return (job.salary_amount === undefined || job.salary_amount === null || job.salary_amount === 0) &&
-                   job.equity_percentage && job.equity_percentage > 0;
+          if (range === 'equity') {
+            return (
+              (job.salary_amount === undefined ||
+                job.salary_amount === null ||
+                job.salary_amount === 0) &&
+              job.equity_percentage &&
+              job.equity_percentage > 0
+            );
           }
 
           // Handle salary ranges
@@ -100,12 +99,18 @@ const handlePageChange = (page) => {
           const salaryValue = job.salary_amount;
 
           switch (range) {
-            case "0-50": return salaryValue < 50;
-            case "50-100": return salaryValue >= 50 && salaryValue < 100;
-            case "100-150": return salaryValue >= 100 && salaryValue < 150;
-            case "150-200": return salaryValue >= 150 && salaryValue < 200;
-            case "200+": return salaryValue >= 200;
-            default: return true;
+            case '0-50':
+              return salaryValue < 50;
+            case '50-100':
+              return salaryValue >= 50 && salaryValue < 100;
+            case '100-150':
+              return salaryValue >= 100 && salaryValue < 150;
+            case '150-200':
+              return salaryValue >= 150 && salaryValue < 200;
+            case '200+':
+              return salaryValue >= 200;
+            default:
+              return true;
           }
         });
       });
@@ -131,7 +136,9 @@ const handlePageChange = (page) => {
           <div className="mb-6 p-8 md:p-12">
             <h1 className="mb-6 font-bold text-gray-900 text-4xl md:text-6xl">
               Find Your Dream
-              <span className="block bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600 text-transparent">Startup Job</span>
+              <span className="block bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600 text-transparent">
+                Startup Job
+              </span>
             </h1>
             <p className="mx-auto mb-8 max-w-2xl text-gray-600 text-xl">
               Where your skills earn ownership, not just a salary.
@@ -145,7 +152,7 @@ const handlePageChange = (page) => {
                   <Input
                     placeholder="Search jobs, companies, or skills..."
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={e => setSearchTerm(e.target.value)}
                     className="bg-gray-50 pl-10 border-gray-200"
                   />
                 </div>
@@ -201,16 +208,18 @@ const handlePageChange = (page) => {
                 <Search className="w-8 h-8 text-gray-500" />
               </div>
               <h3 className="mb-2 font-semibold text-gray-800 text-xl">No jobs found</h3>
-              <p className="mb-6 text-gray-500">Try adjusting your search criteria or check back later.</p>
+              <p className="mb-6 text-gray-500">
+                Try adjusting your search criteria or check back later.
+              </p>
               <Button
                 onClick={() => {
-                  setSearchTerm("");
+                  setSearchTerm('');
                   setFilters({
                     categories: [],
                     remoteTypes: [],
                     locations: [],
                     salaryRanges: [],
-                    equityRange: 0
+                    equityRange: 0,
                   });
                 }}
                 variant="outline"
@@ -218,37 +227,39 @@ const handlePageChange = (page) => {
                 Clear Filters
               </Button>
             </div>
-          ) : (<>
-            <div className="space-y-6">
-              {filteredJobs.map((job) => (
-                <JobCard key={job.id} job={job} user={user} />
-              ))}
-            </div>
-            <div className="flex justify-center space-x-2 mt-10">
-              <Button
-                variant="outline"
-                disabled={currentPage === 1}
-                onClick={() => handlePageChange(currentPage - 1)}
-              >
-                Previous
-              </Button>
-              {[...Array(totalPages)].map((_, i) => (
+          ) : (
+            <>
+              <div className="space-y-6">
+                {filteredJobs.map(job => (
+                  <JobCard key={job.id} job={job} user={user} />
+                ))}
+              </div>
+              <div className="flex justify-center space-x-2 mt-10">
                 <Button
-                  key={i}
-                  variant={currentPage === i + 1 ? "default" : "outline"}
-                  onClick={() => handlePageChange(i + 1)}
+                  variant="outline"
+                  disabled={currentPage === 1}
+                  onClick={() => handlePageChange(currentPage - 1)}
                 >
-                  {i + 1}
+                  Previous
                 </Button>
-              ))}
-              <Button
-                variant="outline"
-                disabled={currentPage === totalPages}
-                onClick={() => handlePageChange(currentPage + 1)}
-              >
-                Next
-              </Button>
-            </div></>
+                {[...Array(totalPages)].map((_, i) => (
+                  <Button
+                    key={i}
+                    variant={currentPage === i + 1 ? 'default' : 'outline'}
+                    onClick={() => handlePageChange(i + 1)}
+                  >
+                    {i + 1}
+                  </Button>
+                ))}
+                <Button
+                  variant="outline"
+                  disabled={currentPage === totalPages}
+                  onClick={() => handlePageChange(currentPage + 1)}
+                >
+                  Next
+                </Button>
+              </div>
+            </>
           )}
         </div>
       </section>

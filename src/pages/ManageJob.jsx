@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useParams } from 'react-router-dom';
 
-import { Payment } from '@/api/entities';
 import { firebaseServices } from '@/api/firebase/services';
 import useUserStore from '@/api/zustand';
 import { Button } from '@/components/ui/button';
@@ -42,7 +41,7 @@ export default function ManageJob() {
       const jobData = await firebaseServices.getJob(jobId);
       if (jobData) {
         setJob(jobData);
-        
+
         // Fetch applications for this job
         if (jobData.applications && jobData.applications.length > 0) {
           const jobApplications = await Promise.all(
@@ -59,8 +58,8 @@ export default function ManageJob() {
         const userPayments = await Promise.all(
           user.payments.map(ref => firebaseServices.getDocument(ref))
         );
-        const jobPayment = userPayments.find(payment => 
-          payment && payment.job_id === jobId && payment.status === 'completed'
+        const jobPayment = userPayments.find(
+          payment => payment && payment.job_id === jobId && payment.status === 'completed'
         );
         setIsUnlocked(!!jobPayment);
       } else {
@@ -138,7 +137,7 @@ export default function ManageJob() {
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
-        
+
         {!isUnlocked && applications.length > 3 && (
           <Alert className="bg-blue-50 mb-6 border-blue-500">
             <Lock className="w-4 h-4 text-blue-700" />

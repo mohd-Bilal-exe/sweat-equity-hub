@@ -1,15 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Job } from '@/api/entities';
-import { User } from '@/api/entities';
-import { Application } from '@/api/entities';
-import { SendEmail } from '@/api/integrations';
 import { firebaseServices } from '@/api/firebase/services';
 import useUserStore from '@/api/zustand';
 import {
   MapPin,
   Building2,
-  Clock,
   Zap,
   Users,
   Calendar,
