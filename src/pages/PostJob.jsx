@@ -50,13 +50,6 @@ export default function PostJob() {
   const [showSalary, setShowSalary] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState(null);
-
-  useEffect(() => {
-    if (isEditing) {
-      loadJob();
-    }
-  }, [isEditing, loadJob]);
-
   const loadJob = useCallback(async () => {
     try {
       console.log('Loading job with ID:', jobId);
@@ -84,6 +77,11 @@ export default function PostJob() {
       setError('Failed to load job details.');
     }
   }, [jobId]);
+  useEffect(() => {
+    if (isEditing) {
+      loadJob();
+    }
+  }, [isEditing, loadJob]);
 
   const handleInputChange = e => {
     const { id, value } = e.target;

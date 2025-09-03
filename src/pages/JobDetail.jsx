@@ -62,7 +62,7 @@ export default function JobDetail() {
         setHasApplied(false);
         return;
       }
-      
+
       // More efficient: check applications one by one until we find a match
       for (const appRef of user.applications) {
         try {
@@ -114,52 +114,45 @@ export default function JobDetail() {
         status: 'submitted',
         created_date: new Date().toISOString(),
       });
-    } catch {
-    } finally {
-      setIsApplying(false);
-    }
-    // Send email notification to employer
-    /*try {
-        const skillsList = user.skills && user.skills.length > 0 ? user.skills.join(", ") : "Not specified";
-        const emailBody = `
-New Application Received!
 
-Job: ${job.title}
-Company: ${job.company_name}
+      // Send email notification using EmailJS (free service)
+      try {
+        const emailjs = (await import('emailjs-com')).default;
 
-Applicant Details:
-Name: ${user.full_name}
-Email: ${user.email}
-Skills: ${skillsList}
-LinkedIn: ${user.linkedin_url || "Not provided"}
-CV: ${user.cv_url || "Not provided"}
+        const skillsList =
+          user.skills && user.skills.length > 0 ? user.skills.join(', ') : 'Not specified';
 
-${coverMessage ? `Cover Message: ${coverMessage}` : ''}
-
-You can view and manage all applications in your employer dashboard at ${window.location.origin}${createPageUrl("EmployerDashboard")}
-
-Best regards,
-The sweatquity Team
-        `;
-
-        await SendEmail({
-          to: job.created_by, // Assuming job.created_by is the employer's ID or email
-          subject: `New Application: ${job.title} - ${user.full_name}`,
-          body: emailBody,
-          from_name: "sweatquity"
-        });
+        await emailjs.send(
+          'service_1rtl8ei', // EmailJS service ID
+          'template_xq5dxnl', // EmailJS template ID
+          {
+            to_email: job.company_email || 'employer@company.com', // Employer email
+            job_title: job.title,
+            company_name: job.company_name,
+            applicant_name: user.full_name,
+            applicant_email: user.email,
+            applicant_skills: skillsList,
+            linkedin_url: user.linkedin_url || 'Not provided',
+            cv_url: user.cv_url || 'Not provided',
+            cover_message: coverMessage || 'No cover message provided',
+            dashboard_url: `${window.location.origin}${createPageUrl('EmployerDashboard')}`,
+          },
+          'kIHQ_Mqe8gU9Uvzt8' // EmailJS public key
+        );
       } catch (emailError) {
-        console.error("Failed to send notification email:", emailError);
+        console.error('Failed to send notification email:', emailError);
         // Don't fail the application if email fails
       }
 
       setHasApplied(true);
       setShowApplication(false);
-      setCoverMessage("");
+      setCoverMessage('');
     } catch (error) {
-      console.error("Error applying for job:", error);
-      setError("Failed to submit application. Please try again.");
-    }*/
+      console.error('Error applying for job:', error);
+      setError('Failed to submit application. Please try again.');
+    } finally {
+      setIsApplying(false);
+    }
   };
 
   if (isLoading) {
