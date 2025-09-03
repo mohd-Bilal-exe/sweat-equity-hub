@@ -1,23 +1,23 @@
-import React, { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
-import { Job } from "@/api/entities";
-import { Application } from "@/api/entities";
-import { Payment } from "@/api/entities";
-import { User } from "@/api/entities";
-import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardContent, CardTitle, CardDescription } from "@/components/ui/card";
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import ApplicantList from "../components/employer/ApplicantList";
-import ApplicationPipeline from "../components/employer/ApplicationPipeline";
-import { Lock, CreditCard, ArrowLeft } from "lucide-react";
-import { createPageUrl } from "@/utils";
+import React, { useState, useEffect } from 'react';
+import { useSearchParams, useParams } from 'react-router-dom';
+
+import { Payment } from '@/api/entities';
+import { firebaseServices } from '@/api/firebase/services';
+import useUserStore from '@/api/zustand';
+import { Button } from '@/components/ui/button';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import ApplicantList from '../components/employer/ApplicantList';
+import ApplicationPipeline from '../components/employer/ApplicationPipeline';
+import { Lock, CreditCard, ArrowLeft } from 'lucide-react';
+import { createPageUrl } from '@/utils';
 
 export default function ManageJob() {
   const [searchParams] = useSearchParams();
-  const jobId = searchParams.get("id");
-  
-  const [user, setUser] = useState(null);
+  const { id: paramJobId } = useParams();
+  const jobId = paramJobId || searchParams.get('id');
+
+  const { user } = useUserStore();
   const [job, setJob] = useState(null);
   const [applications, setApplications] = useState([]);
   const [isUnlocked, setIsUnlocked] = useState(false);
@@ -25,122 +25,144 @@ export default function ManageJob() {
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
   useEffect(() => {
-    if (jobId) {
+    if (jobId && user) {
       fetchData();
     }
-  }, [jobId]);
+  }, [jobId, user]);
 
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      const currentUser = await User.me();
-      setUser(currentUser);
-      
-      const [jobData, appData, paymentData] = await Promise.all([
-        Job.filter({ id: jobId }),
-        Application.filter({ job_id: jobId }, "-created_date"),
-        Payment.filter({ job_id: jobId, employer_id: currentUser.id })
-      ]);
-      
-      if (jobData.length > 0) setJob(jobData[0]);
-      setApplications(appData);
-      setIsUnlocked(paymentData.length > 0);
-      
+      if (!user?.uid) {
+        setIsLoading(false);
+        return;
+      }
+
+      const jobData = await firebaseServices.getJob(jobId);
+      if (jobData) {
+        setJob(jobData);
+        
+        // Fetch applications for this job
+        if (jobData.applications && jobData.applications.length > 0) {
+          const jobApplications = await Promise.all(
+            jobData.applications.map(ref => firebaseServices.getDocument(ref))
+          );
+          setApplications(jobApplications.filter(Boolean));
+        } else {
+          setApplications([]);
+        }
+      }
+
+      // Check if user has paid to unlock all applications
+      if (user.payments && user.payments.length > 0) {
+        const userPayments = await Promise.all(
+          user.payments.map(ref => firebaseServices.getDocument(ref))
+        );
+        const jobPayment = userPayments.find(payment => 
+          payment && payment.job_id === jobId && payment.status === 'completed'
+        );
+        setIsUnlocked(!!jobPayment);
+      } else {
+        setIsUnlocked(false);
+      }
     } catch (error) {
-      console.error("Error fetching job management data:", error);
+      console.error('Error fetching job management data:', error);
     }
     setIsLoading(false);
   };
-  
+
   const handleUnlock = async () => {
     setIsProcessingPayment(true);
     try {
-        await Payment.create({
-            employer_id: user.id,
-            job_id: jobId,
-            job_title: job.title,
-            amount: 20.00,
-            currency: "USD",
-            payment_method: "Stripe (Simulated)",
-            transaction_id: `txn_${Date.now()}`,
-            status: "completed"
-        });
-        setIsUnlocked(true);
+      await Payment.create({
+        employer_id: user.id,
+        job_id: jobId,
+        job_title: job.title,
+        amount: 20.0,
+        currency: 'USD',
+        payment_method: 'Stripe (Simulated)',
+        transaction_id: `txn_${Date.now()}`,
+        status: 'completed',
+      });
+      setIsUnlocked(true);
     } catch (error) {
-        console.error("Payment failed", error);
-        alert("Payment failed. Please try again.");
+      console.error('Payment failed', error);
+      alert('Payment failed. Please try again.');
     }
     setIsProcessingPayment(false);
-  }
+  };
 
   const updateApplicationStatus = async (applicationId, newStatus) => {
     try {
-      await Application.update(applicationId, { status: newStatus });
+      await firebaseServices.updateJobApplication(applicationId, { status: newStatus });
       await fetchData(); // Refresh data
     } catch (error) {
-      console.error("Error updating application status:", error);
+      console.error('Error updating application status:', error);
     }
   };
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-screen bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+      <div className="flex justify-center items-center bg-gray-50 h-screen">
+        <div className="border-gray-900 border-b-2 rounded-full w-12 h-12 animate-spin"></div>
       </div>
     );
   }
-  
-  if(!job) {
-    return <div className="text-center py-20">Job not found.</div>
+
+  if (!job) {
+    return <div className="py-20 text-center">Job not found.</div>;
   }
 
   return (
-    <div className="bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="bg-gray-50 px-4 sm:px-6 lg:px-8 py-8 h-full">
+      <div className="mx-auto max-w-7xl">
         <div className="mb-8">
-          <Button 
-            onClick={() => window.location.href = createPageUrl("EmployerDashboard")}
+          <Button
+            onClick={() => (window.location.href = createPageUrl('EmployerDashboard'))}
             variant="ghost"
             className="mb-4 text-gray-600 hover:text-gray-900"
           >
-            <ArrowLeft className="w-4 h-4 mr-2" />
+            <ArrowLeft className="mr-2 w-4 h-4" />
             Back to Dashboard
           </Button>
-          <h1 className="text-3xl font-bold text-gray-900">Manage Applicants</h1>
-          <p className="text-gray-600">Job: {job.title} • {applications.length} applications</p>
+          <h1 className="font-bold text-gray-900 text-3xl">Manage Applicants</h1>
+          <p className="text-gray-600">
+            Job: {job.title} • {applications.length} applications
+          </p>
         </div>
-        
+
         {!isUnlocked && applications.length > 3 && (
-            <Alert className="mb-6 border-blue-500 bg-blue-50">
-                <Lock className="h-4 w-4 text-blue-700"/>
-                <AlertTitle className="text-blue-800">Unlock More Applicants</AlertTitle>
-                <AlertDescription className="text-blue-700">
-                    You can view the first 3 applicants for free. To unlock all {applications.length} applicants, please complete the payment.
-                    <Button onClick={handleUnlock} disabled={isProcessingPayment} className="mt-4">
-                        <CreditCard className="w-4 h-4 mr-2"/>
-                        {isProcessingPayment ? 'Processing...' : 'Unlock All for $20'}
-                    </Button>
-                </AlertDescription>
-            </Alert>
+          <Alert className="bg-blue-50 mb-6 border-blue-500">
+            <Lock className="w-4 h-4 text-blue-700" />
+            <AlertTitle className="text-blue-800">Unlock More Applicants</AlertTitle>
+            <AlertDescription className="text-blue-700">
+              You can view the first 3 applicants for free. To unlock all {applications.length}{' '}
+              applicants, please complete the payment.
+              <Button onClick={handleUnlock} disabled={isProcessingPayment} className="mt-4">
+                <CreditCard className="mr-2 w-4 h-4" />
+                {isProcessingPayment ? 'Processing...' : 'Unlock All for $20'}
+              </Button>
+            </AlertDescription>
+          </Alert>
         )}
-        
+
         <Tabs defaultValue="pipeline" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid grid-cols-2 w-full">
             <TabsTrigger value="pipeline">Pipeline View</TabsTrigger>
             <TabsTrigger value="list">List View</TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="pipeline" className="space-y-4">
-            <ApplicationPipeline 
-              applications={applications} 
+            <ApplicationPipeline
+              applications={applications}
               isUnlocked={isUnlocked}
               onStatusUpdate={updateApplicationStatus}
             />
           </TabsContent>
-          
+
           <TabsContent value="list" className="space-y-4">
-            <ApplicantList 
-              applications={applications} 
+            <ApplicantList
+              applications={applications}
               isUnlocked={isUnlocked}
               onStatusUpdate={updateApplicationStatus}
             />

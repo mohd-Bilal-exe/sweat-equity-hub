@@ -15,11 +15,13 @@ import { Badge } from "@/components/ui/badge";
 
 import JobCard from "../components/home/JobCard";
 import SearchFilters from "../components/home/SearchFilters";
+import { firebaseServices } from "@/api/firebase/services";
+import useUserStore from "@/api/zustand";
 
 export default function Home() {
   const [jobs, setJobs] = useState([]);
   const [filteredJobs, setFilteredJobs] = useState([]);
-  const [user, setUser] = useState(null);
+  const { user } = useUserStore();
   const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState({
     categories: [],
@@ -44,26 +46,17 @@ const handlePageChange = (page) => {
 };
   useEffect(() => {
     loadJobs();
-    checkAuth();
   }, []);
 
   useEffect(() => {
     filterJobs();
   }, [jobs, searchTerm, filters]);
 
-  const checkAuth = async () => {
-    try {
-      const currentUser = await User.me();
-      setUser(currentUser);
-    } catch (error) {
-      setUser(null);
-    }
-  };
-
   const loadJobs = async () => {
     try {
-      const jobData = await Job.filter({ is_active: true }, "-created_date");
-      setJobs(jobData);
+      const jobData = await firebaseServices.getAllJobs({});
+      const activeJobs = jobData.filter(job => job.is_active);
+      setJobs(activeJobs);
     } catch (error) {
       console.error("Error loading jobs:", error);
     }

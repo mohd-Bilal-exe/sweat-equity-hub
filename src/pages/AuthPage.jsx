@@ -1,5 +1,6 @@
 import { firebaseServices } from '@/api/firebase/services'
 import useUserStore from '@/api/zustand'
+import { createPageUrl } from '@/utils'
 import React, { useState } from 'react'
 import { FcGoogle } from 'react-icons/fc'
 import { HiOutlineMail, HiOutlineLockClosed, HiEye, HiEyeOff } from 'react-icons/hi'
@@ -14,14 +15,19 @@ const AuthPage = () => {
   const [error, setError] = useState('')
   const { user } = useUserStore()
     const navigate=useNavigate()
+     const url=createPageUrl("Profile")
   const handleAuth = async () => {
     setLoading(true)
     setError('')
     try {
       const userData = await firebaseServices.signInWithEmail(email, password)
+
+      navigate(url)
     } catch {
       try {
         const userData = await firebaseServices.signUpWithEmail(email, password)
+         const userId= await firebaseServices.createUser(userData)
+         navigate(url)
       } catch (err) {
         setError(err.message)
       }
@@ -35,7 +41,7 @@ const AuthPage = () => {
     setError('')
     try {
       await firebaseServices.signInWithGoogle()
-        navigate("/")
+        navigate(url)
     } catch (err) {
       setError(err.message)
     } finally {
