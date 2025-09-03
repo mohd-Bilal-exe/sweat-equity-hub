@@ -19,6 +19,7 @@ import Pricing from "./Pricing";
 import About from "./About";
 
 import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
+import AuthPage from "./AuthPage.jsx";
 
 const PAGES = {
     
@@ -62,11 +63,13 @@ function PagesContent() {
     
     return (
         <Layout currentPageName={currentPage}>
-            <Routes>            
-                
-                    <Route path="/" element={<Home />} />
-                
-                
+            <Routes>       
+                <Route path="/auth" element={<AuthPage/>} />
+
+                <Route path="*" element={<div>404</div>} />
+
+                <Route path="/" element={<Home />} />
+
                 <Route path="/Home" element={<Home />} />
                 
                 <Route path="/JobDetail" element={<JobDetail />} />

@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 
 
 import React, { useState, useEffect } from "react";
@@ -24,36 +25,28 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import useUserStore from "@/api/zustand";
+import { use } from "react";
+import { firebaseServices } from '@/api/firebase/services';
 
 export default function Layout({ children, currentPageName }) {
   const location = useLocation();
-  const [user, setUser] = useState(null);
+  const [User, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
-  const checkAuth = async () => {
-    try {
-      const currentUser = await User.me();
-      setUser(currentUser);
-    } catch (error) {
-      setUser(null);
+  const {user}=useUserStore()
+const Navigate=useNavigate()
+  useEffect(()=>{
+    setUser(user)
+    console.log(User)
+    if(User){
+      setIsLoading(false)
+    }else{
+      Navigate("/auth")
     }
-    setIsLoading(false);
-  };
+  })
 
-  const handleLogout = async () => {
-    await User.logout();
-    setUser(null);
-    window.location.href = createPageUrl("Home");
-  };
 
-  const handleLogin = async () => {
-    await User.loginWithRedirect(window.location.origin + createPageUrl("Home"));
-  };
 
   const navItems = [
     { name: "Browse Jobs", href: createPageUrl("Home"), icon: Briefcase },
@@ -97,12 +90,12 @@ export default function Layout({ children, currentPageName }) {
             <div className="flex items-center space-x-4">
               {!isLoading && (
                 <>
-                  {user ? (
+                  {User ? (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost">
                           <UserIcon className="mr-2 w-4 h-4" />
-                          {user.full_name}
+                          {user.full_name||user.email}
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent className="w-56">
@@ -115,7 +108,7 @@ export default function Layout({ children, currentPageName }) {
                               Profile
                             </Link>
                           </DropdownMenuItem>
-                          {user.user_type === "talent" && (
+                          {User.user_type === "talent" && (
                             <DropdownMenuItem asChild>
                               <Link to={createPageUrl("TalentDashboard")}>
                                 <Briefcase className="mr-2 w-4 h-4" />
@@ -123,7 +116,7 @@ export default function Layout({ children, currentPageName }) {
                               </Link>
                             </DropdownMenuItem>
                           )}
-                          {user.user_type === "employer" && (
+                          {User.user_type === "employer" && (
                             <>
                               <DropdownMenuItem asChild>
                                 <Link to={createPageUrl("EmployerDashboard")}>
@@ -141,19 +134,20 @@ export default function Layout({ children, currentPageName }) {
                           )}
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={handleLogout}>
+                        <DropdownMenuItem onClick={firebaseServices.signOutUser}>
                           <LogOut className="mr-2 w-4 h-4" />
                           Logout
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   ) : (
-                    <Button
-                      onClick={handleLogin}
+                    <Link
+                    to="/auth"
                       variant="outline"
+                      className="hover:bg-gray-100 px-3 py-2 border rounded-lg font-medium text-gray-800 hover:text-gray-900 text-sm transition-colors duration-200"
                     >
                       Sign In
-                    </Button>
+                    </Link>
                   )}
                 </>
               )}
