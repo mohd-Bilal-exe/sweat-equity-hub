@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Job } from '@/api/entities';
 import { User } from '@/api/entities';
@@ -40,9 +40,7 @@ export default function JobDetail() {
   useEffect(() => {
     if (jobId) {
       loadJobDetails();
-      if (user) {
-        checkApplicationStatus();
-      }
+      checkApplicationStatus();
     }
   }, [jobId, user]);
 
@@ -58,22 +56,32 @@ export default function JobDetail() {
     setIsLoading(false);
   };
 
-  const checkApplicationStatus = async () => {
+  const checkApplicationStatus = useCallback(async () => {
     try {
-      if (!user?.applications) {
+      if (!user?.applications || user.applications.length === 0) {
         setHasApplied(false);
         return;
       }
-      // Check if user has already applied to this job
-      const userApplications = await Promise.all(
-        user.applications.map(ref => firebaseServices.getDocument(ref))
-      );
-      const hasAppliedToJob = userApplications.some(app => app?.job_id === jobId);
-      setHasApplied(hasAppliedToJob);
+      
+      // More efficient: check applications one by one until we find a match
+      for (const appRef of user.applications) {
+        try {
+          const app = await firebaseServices.getDocument(appRef);
+          if (app?.job_id === jobId) {
+            setHasApplied(true);
+            return;
+          }
+        } catch (error) {
+          console.error('Error checking individual application:', error);
+          continue;
+        }
+      }
+      setHasApplied(false);
     } catch (error) {
       console.error('Error checking application status:', error);
+      setHasApplied(false);
     }
-  };
+  }, [user?.applications, jobId]);
 
   const handleApply = async () => {
     if (!user) {

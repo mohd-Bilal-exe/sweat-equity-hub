@@ -1,7 +1,7 @@
 import { firebaseServices } from '@/api/firebase/services'
 import useUserStore from '@/api/zustand'
 import { createPageUrl } from '@/utils'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { FcGoogle } from 'react-icons/fc'
 import { HiOutlineMail, HiOutlineLockClosed, HiEye, HiEyeOff } from 'react-icons/hi'
 import { useNavigate } from 'react-router-dom'
@@ -14,20 +14,33 @@ const AuthPage = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const { user } = useUserStore()
-    const navigate=useNavigate()
-     const url=createPageUrl("Profile")
+  const navigate = useNavigate()
+  
+  const getRedirectUrl = (userData) => {
+    if (userData?.user_type === 'employer') {
+      return createPageUrl('EmployerDashboard')
+    } else if (userData?.user_type === 'talent') {
+      return createPageUrl('TalentDashboard')
+    }
+    return createPageUrl('Profile')
+  }
+  
+  useEffect(() => {
+    if (user) {
+      navigate(getRedirectUrl(user))
+    }
+  }, [user, navigate])
   const handleAuth = async () => {
     setLoading(true)
     setError('')
     try {
       const userData = await firebaseServices.signInWithEmail(email, password)
-
-      navigate(url)
+      navigate(getRedirectUrl(userData))
     } catch {
       try {
         const userData = await firebaseServices.signUpWithEmail(email, password)
-         const userId= await firebaseServices.createUser(userData)
-         navigate(url)
+        await firebaseServices.createUser(userData)
+        navigate(getRedirectUrl(userData))
       } catch (err) {
         setError(err.message)
       }
@@ -40,8 +53,8 @@ const AuthPage = () => {
     setLoading(true)
     setError('')
     try {
-      await firebaseServices.signInWithGoogle()
-        navigate(url)
+      const userData = await firebaseServices.signInWithGoogle()
+      navigate(getRedirectUrl(userData))
     } catch (err) {
       setError(err.message)
     } finally {

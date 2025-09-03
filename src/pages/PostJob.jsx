@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { User } from '@/api/entities';
 import { Job } from '@/api/entities';
 import { useNavigate, Link, useSearchParams, useParams } from 'react-router-dom';
@@ -55,9 +55,9 @@ export default function PostJob() {
     if (isEditing) {
       loadJob();
     }
-  }, [jobId]);
+  }, [isEditing, loadJob]);
 
-  const loadJob = async () => {
+  const loadJob = useCallback(async () => {
     try {
       console.log('Loading job with ID:', jobId);
       const job = await firebaseServices.getJob(jobId);
@@ -83,7 +83,7 @@ export default function PostJob() {
       console.error('Error loading job:', error);
       setError('Failed to load job details.');
     }
-  };
+  }, [jobId]);
 
   const handleInputChange = e => {
     const { id, value } = e.target;

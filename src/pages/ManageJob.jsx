@@ -23,6 +23,7 @@ export default function ManageJob() {
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     if (jobId && user) {
@@ -87,7 +88,7 @@ export default function ManageJob() {
       setIsUnlocked(true);
     } catch (error) {
       console.error('Payment failed', error);
-      alert('Payment failed. Please try again.');
+      setError('Payment failed. Please try again.');
     }
     setIsProcessingPayment(false);
   };
@@ -131,6 +132,13 @@ export default function ManageJob() {
           </p>
         </div>
 
+        {error && (
+          <Alert variant="destructive" className="mb-6">
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+        
         {!isUnlocked && applications.length > 3 && (
           <Alert className="bg-blue-50 mb-6 border-blue-500">
             <Lock className="w-4 h-4 text-blue-700" />

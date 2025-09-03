@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { MapPin, Building2, Clock, ChevronRight, Zap, DollarSign } from 'lucide-react';
@@ -6,16 +6,18 @@ import { Button } from '@/components/ui/button';
 import { formatDistanceToNow } from 'date-fns';
 
 export default function JobCard({ job, user }) {
+  const [imageError, setImageError] = useState(false);
   const handleApply = async () => {};
 
   return (
     <div className="flex sm:flex-row flex-col items-start sm:items-center gap-6 bg-white hover:shadow-lg p-4 sm:p-6 border rounded-xl transition-shadow">
       <div className="flex-shrink-0">
-        {job.company_logo ? (
+        {job.company_logo && !imageError ? (
           <img
             src={job.company_logo}
             alt={job.company_name}
             className="rounded-lg w-16 h-16 object-cover"
+            onError={() => setImageError(true)}
           />
         ) : (
           <div className="flex justify-center items-center bg-gray-100 rounded-lg w-16 h-16">

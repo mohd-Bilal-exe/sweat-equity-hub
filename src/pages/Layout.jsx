@@ -34,13 +34,18 @@ export default function Layout({ children, currentPageName }) {
   const { user } = useUserStore();
   const Navigate = useNavigate();
   useEffect(() => {
+    if (location.pathname === '/auth' || location.pathname === '/Auth') {
+      setIsLoading(false);
+      return;
+    }
+    
     if (user) {
       setIsLoading(false);
     } else {
       const url = createPageUrl('Auth');
       Navigate(url);
     }
-  });
+  }, [user, location.pathname, Navigate]);
 
   const navItems = [
     { name: 'Browse Jobs', href: createPageUrl('Home'), icon: Briefcase },

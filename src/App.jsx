@@ -27,7 +27,7 @@ function App() {
         unsubscribe();
       }
     };
-  }, [user?.uid]);
+  }, [user?.uid, updateUser]);
   return (
     <>
       <Pages />
