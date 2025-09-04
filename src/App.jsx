@@ -1,6 +1,8 @@
 import './App.css';
 import Pages from '@/pages/index.jsx';
 import { Toaster } from '@/components/ui/toaster';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { useEffect } from 'react';
 import { firebaseServices } from './api/firebase/services';
 import useUserStore from './api/zustand';
@@ -32,6 +34,17 @@ function App() {
     <>
       <Pages />
       <Toaster />
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </>
   );
 }

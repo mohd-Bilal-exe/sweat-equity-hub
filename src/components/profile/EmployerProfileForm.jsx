@@ -18,10 +18,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Upload, Building2, LinkIcon, Trash2 } from 'lucide-react';
+import { Upload, LinkIcon, Trash2 } from 'lucide-react';
 import { firebaseServices } from '@/api/firebase/services';
-import useUserStore from '@/api/zustand';
-import { set } from 'date-fns';
 
 export default function EmployerProfileForm({ user }) {
   const [profile, setProfile] = useState({
