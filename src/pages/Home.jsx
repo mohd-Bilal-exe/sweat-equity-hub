@@ -133,145 +133,150 @@ export default function Home() {
 
   return (
     <>
-      <SEO 
+      <SEO
         title="Find Your Dream Startup Job"
         description="Discover equity-based opportunities at innovative startups. Connect with companies offering ownership, not just salary."
         keywords="startup jobs, equity compensation, remote work, tech jobs, startup careers, job board"
       />
       <div className="bg-white min-h-screen">
-      {/* Hero Section */}
-      <section className="relative px-4 sm:px-6 lg:px-8 py-12">
-        <div className="mx-auto max-w-4xl text-center">
-          <div className="mb-6 p-8 md:p-12">
-            <h1 className="mb-6 font-bold text-gray-900 text-4xl md:text-6xl">
-              Find Your Dream
-              <span className="block bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600 text-transparent">
-                Startup Job
-              </span>
-            </h1>
-            <p className="mx-auto mb-8 max-w-2xl text-gray-600 text-xl">
-              Where your skills earn ownership, not just a salary.
-            </p>
+        {/* Hero Section */}
+        <section className="relative px-4 sm:px-6 lg:px-8 py-12">
+          <div className="mx-auto max-w-4xl text-center">
+            <div className="mb-6 p-8 md:p-12">
+              <h1 className="mb-6 font-bold text-gray-900 text-4xl md:text-6xl">
+                Find Your Dream
+                <span className="block bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600 text-transparent">
+                  Startup Job
+                </span>
+              </h1>
+              <p className="mx-auto mb-8 max-w-2xl text-gray-600 text-xl">
+                Where your skills earn ownership, not just a salary.
+              </p>
 
-            {/* Search Bar */}
-            <div className="bg-white shadow-sm mx-auto p-4 border rounded-xl max-w-2xl">
-              <div className="flex md:flex-row flex-col gap-4">
-                <div className="relative flex-1">
-                  <Search className="top-3 left-3 absolute w-5 h-5 text-gray-400" />
-                  <Input
-                    placeholder="Search jobs, companies, or skills..."
-                    value={searchTerm}
-                    onChange={e => setSearchTerm(e.target.value)}
-                    className="bg-gray-50 pl-10 border-gray-200"
-                  />
+              {/* Search Bar */}
+              <div className="bg-white shadow-sm mx-auto p-4 border rounded-xl max-w-2xl">
+                <div className="flex md:flex-row flex-col gap-4">
+                  <div className="relative flex-1">
+                    <Search className="top-3 left-3 absolute w-5 h-5 text-gray-400" />
+                    <Input
+                      placeholder="Search jobs, companies, or skills..."
+                      value={searchTerm}
+                      onChange={e => setSearchTerm(e.target.value)}
+                      className="bg-gray-50 pl-10 border-gray-200"
+                    />
+                  </div>
+                  <Button onClick={() => searchTerm && analytics.trackSearch(searchTerm)}>
+                    <Search className="mr-2 w-4 h-4" />
+                    Search
+                  </Button>
                 </div>
-                <Button onClick={() => searchTerm && analytics.trackSearch(searchTerm)}>
-                  <Search className="mr-2 w-4 h-4" />
-                  Search
-                </Button>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Filters and Jobs Section */}
-      <section className="px-4 sm:px-6 lg:px-8 pb-20">
-        <div className="mx-auto max-w-4xl">
-          {/* Filters */}
-          <SearchFilters
-            filters={filters}
-            setFilters={setFilters}
-            uniqueLocations={uniqueLocations}
-          />
+        {/* Filters and Jobs Section */}
+        <section className="px-4 sm:px-6 lg:px-8 pb-20">
+          <div className="mx-auto max-w-4xl">
+            {/* Filters */}
+            <SearchFilters
+              filters={filters}
+              setFilters={setFilters}
+              uniqueLocations={uniqueLocations}
+            />
 
-          {/* Jobs List */}
-          <div className="flex justify-between items-center mb-8">
-            <h2 className="font-bold text-gray-800 text-2xl">
-              {filteredJobs.length} Jobs Available
-            </h2>
-            <div className="flex items-center space-x-2 text-gray-500">
-              <Clock className="w-4 h-4" />
-              <span className="text-sm">Updated daily</span>
+            {/* Jobs List */}
+            <div className="flex justify-between items-center mb-8">
+              <h2 className="font-bold text-gray-800 text-2xl">
+                {filteredJobs.length} Jobs Available
+              </h2>
+              <div className="flex items-center space-x-2 text-gray-500">
+                <Clock className="w-4 h-4" />
+                <span className="text-sm">Updated daily</span>
+              </div>
             </div>
-          </div>
 
-          {isLoading ? (
-            <div className="space-y-6">
-              {[...Array(3)].map((_, i) => (
-                <div key={i} className="bg-white p-6 border rounded-lg animate-pulse">
-                  <div className="flex gap-6">
-                    <div className="bg-gray-200 rounded-lg w-16 h-16"></div>
-                    <div className="flex-1 space-y-3">
-                      <div className="bg-gray-200 rounded w-3/4 h-4"></div>
-                      <div className="bg-gray-200 rounded w-1/2 h-3"></div>
-                      <div className="bg-gray-200 rounded w-2/3 h-3"></div>
+            {isLoading ? (
+              <div className="space-y-6">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="bg-white p-6 border rounded-lg animate-pulse">
+                    <div className="flex gap-6">
+                      <div className="bg-gray-200 rounded-lg w-16 h-16"></div>
+                      <div className="flex-1 space-y-3">
+                        <div className="bg-gray-200 rounded w-3/4 h-4"></div>
+                        <div className="bg-gray-200 rounded w-1/2 h-3"></div>
+                        <div className="bg-gray-200 rounded w-2/3 h-3"></div>
+                      </div>
                     </div>
                   </div>
+                ))}
+              </div>
+            ) : filteredJobs.length === 0 ? (
+              <div className="bg-white p-12 border rounded-lg text-center">
+                <div className="flex justify-center items-center bg-gray-100 mx-auto mb-6 rounded-full w-16 h-16">
+                  <Search className="w-8 h-8 text-gray-500" />
                 </div>
-              ))}
-            </div>
-          ) : filteredJobs.length === 0 ? (
-            <div className="bg-white p-12 border rounded-lg text-center">
-              <div className="flex justify-center items-center bg-gray-100 mx-auto mb-6 rounded-full w-16 h-16">
-                <Search className="w-8 h-8 text-gray-500" />
-              </div>
-              <h3 className="mb-2 font-semibold text-gray-800 text-xl">No jobs found</h3>
-              <p className="mb-6 text-gray-500">
-                Try adjusting your search criteria or check back later.
-              </p>
-              <Button
-                onClick={() => {
-                  setSearchTerm('');
-                  setFilters({
-                    categories: [],
-                    remoteTypes: [],
-                    locations: [],
-                    salaryRanges: [],
-                    equityRange: 0,
-                  });
-                }}
-                variant="outline"
-              >
-                Clear Filters
-              </Button>
-            </div>
-          ) : (
-            <>
-              <div className="space-y-6">
-                {filteredJobs.map(job => (
-                  <JobCard key={job.id} job={job} user={user} />
-                ))}
-              </div>
-              <div className="flex justify-center space-x-2 mt-10">
+                <h3 className="mb-2 font-semibold text-gray-800 text-xl">No jobs found</h3>
+                <p className="mb-6 text-gray-500">
+                  Try adjusting your search criteria or check back later.
+                </p>
                 <Button
+                  onClick={() => {
+                    setSearchTerm('');
+                    setFilters({
+                      categories: [],
+                      remoteTypes: [],
+                      locations: [],
+                      salaryRanges: [],
+                      equityRange: 0,
+                    });
+                  }}
                   variant="outline"
-                  disabled={currentPage === 1}
-                  onClick={() => handlePageChange(currentPage - 1)}
                 >
-                  Previous
+                  Clear Filters
                 </Button>
-                {[...Array(totalPages)].map((_, i) => (
+              </div>
+            ) : (
+              <>
+                <div className="space-y-6">
+                  {filteredJobs.map(job => (
+                    <Link
+                      to={`${createPageUrl('JobDetail')}?id=${job.id}`}
+                      className="group flex sm:flex-row flex-col items-start sm:items-center gap-6 bg-white hover:shadow-lg p-4 sm:p-6 border rounded-xl transition-shadow"
+                    >
+                      <JobCard key={job.id} job={job} user={user} />
+                    </Link>
+                  ))}
+                </div>
+                <div className="flex justify-center space-x-2 mt-10">
                   <Button
-                    key={i}
-                    variant={currentPage === i + 1 ? 'default' : 'outline'}
-                    onClick={() => handlePageChange(i + 1)}
+                    variant="outline"
+                    disabled={currentPage === 1}
+                    onClick={() => handlePageChange(currentPage - 1)}
                   >
-                    {i + 1}
+                    Previous
                   </Button>
-                ))}
-                <Button
-                  variant="outline"
-                  disabled={currentPage === totalPages}
-                  onClick={() => handlePageChange(currentPage + 1)}
-                >
-                  Next
-                </Button>
-              </div>
-            </>
-          )}
-        </div>
-      </section>
+                  {[...Array(totalPages)].map((_, i) => (
+                    <Button
+                      key={i}
+                      variant={currentPage === i + 1 ? 'default' : 'outline'}
+                      onClick={() => handlePageChange(i + 1)}
+                    >
+                      {i + 1}
+                    </Button>
+                  ))}
+                  <Button
+                    variant="outline"
+                    disabled={currentPage === totalPages}
+                    onClick={() => handlePageChange(currentPage + 1)}
+                  >
+                    Next
+                  </Button>
+                </div>
+              </>
+            )}
+          </div>
+        </section>
       </div>
     </>
   );

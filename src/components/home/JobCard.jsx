@@ -1,7 +1,16 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { MapPin, Building2, Clock, ChevronRight, Zap, DollarSign, Tag } from 'lucide-react';
+import {
+  MapPin,
+  Building2,
+  Clock,
+  ChevronRight,
+  Zap,
+  DollarSign,
+  Tag,
+  ArrowRight,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { formatTimestamp } from '@/utils/timestamp';
@@ -11,7 +20,7 @@ export default function JobCard({ job, user }) {
   const handleApply = async () => {};
 
   return (
-    <div className="flex sm:flex-row flex-col items-start sm:items-center gap-6 bg-white hover:shadow-lg p-4 sm:p-6 border rounded-xl transition-shadow">
+    <>
       <div className="flex-shrink-0">
         {job.company_logo && !imageError ? (
           <img
@@ -37,18 +46,24 @@ export default function JobCard({ job, user }) {
             </Badge>
           )}
         </div>
-        <h4 className="font-bold text-gray-900 hover:text-indigo-700 text-lg transition-colors">
-          <Link to={`${createPageUrl('JobDetail')}?id=${job.id}`}>{job.title}</Link>
-        </h4>
+        <div className="flex items-center gap-2 font-bold text-gray-900 group-hover:text-indigo-700 text-lg transition-colors">
+          <h1 className="transition-all group-hover:translate-x-2 ns">{job.title}</h1>
+          <div className="flex justify-end w-5 h-5 overflow-hidden">
+            <div className="flex w-10 h-5 transition-all group-hover:translate-x-5 duration-300 ease-in-out">
+              <ArrowRight className="w-5 h-5 text-indigo-500" />
+              <div className="w-5 h-5"></div>
+            </div>
+          </div>
+        </div>
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1 text-gray-500 text-sm">
-          <div className="flex items-center">
+          <div className="flex items-center transition-all group-hover:translate-x-1 ease-in-out">
             <MapPin className="mr-1.5 w-4 h-4" />
             <span>
               {job.location} • {job.remote_type}
             </span>
           </div>
-          <div className="flex items-center">
-            <Clock className="mr-1.5 w-4 h-4" />
+          <div className="flex justify-start items-center gap-1 h-4.5 transition-all group-hover:translate-x-1 ease-in-out">
+            <Clock className="w-4" />
             <span>{formatTimestamp(job.createdAt || job.created_date, 'relative')}</span>
           </div>
         </div>
@@ -83,6 +98,6 @@ export default function JobCard({ job, user }) {
           </Button>
         </div>
       </div>
-    </div>
+    </>
   );
 }
