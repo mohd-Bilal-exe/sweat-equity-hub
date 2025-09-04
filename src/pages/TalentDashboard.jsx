@@ -12,16 +12,22 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { format } from 'date-fns';
-import { FileText, Eye, XCircle, Handshake, Award } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { FileText, Eye, XCircle, Handshake, Award, ArrowUpDown } from 'lucide-react';
 import TalentDashboardStats from '../components/talent/DashboardStats';
 import useUserStore from '@/api/zustand';
 import { firebaseServices } from '@/api/firebase/services';
+import { formatTimestamp } from '@/utils/timestamp';
 
 export default function TalentDashboard() {
   const { user } = useUserStore();
   const [applications, setApplications] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [sortBy, setSortBy] = useState('created_date');
+  const [sortOrder, setSortOrder] = useState('desc');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     fetchApplications();
@@ -55,6 +61,33 @@ export default function TalentDashboard() {
     offer: { text: 'Offer', icon: Award, color: 'bg-green-100 text-green-800' },
   };
 
+  const filteredAndSortedApplications = applications
+    .filter(app => {
+      const matchesSearch = app.job_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           app.company_name.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesStatus = statusFilter === 'all' || app.status === statusFilter;
+      return matchesSearch && matchesStatus;
+    })
+    .sort((a, b) => {
+      let aVal = a[sortBy];
+      let bVal = b[sortBy];
+      if (sortBy === 'created_date') {
+        aVal = new Date(aVal);
+        bVal = new Date(bVal);
+      }
+      const result = aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
+      return sortOrder === 'asc' ? result : -result;
+    });
+
+  const handleSort = (column) => {
+    if (sortBy === column) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(column);
+      setSortOrder('asc');
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center bg-gray-50 h-screen">
@@ -86,25 +119,62 @@ export default function TalentDashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            <div className="flex gap-4 mb-4">
+              <Input
+                placeholder="Search jobs or companies..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="max-w-sm"
+              />
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-40">
+                  <SelectValue placeholder="Filter by status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="submitted">Submitted</SelectItem>
+                  <SelectItem value="viewed">Viewed</SelectItem>
+                  <SelectItem value="rejected">Rejected</SelectItem>
+                  <SelectItem value="interview">Interview</SelectItem>
+                  <SelectItem value="offer">Offer</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Job Title</TableHead>
-                  <TableHead>Company</TableHead>
-                  <TableHead>Date Applied</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead>
+                    <Button variant="ghost" onClick={() => handleSort('job_title')} className="h-auto p-0 font-semibold">
+                      Job Title <ArrowUpDown className="ml-1 h-3 w-3" />
+                    </Button>
+                  </TableHead>
+                  <TableHead>
+                    <Button variant="ghost" onClick={() => handleSort('company_name')} className="h-auto p-0 font-semibold">
+                      Company <ArrowUpDown className="ml-1 h-3 w-3" />
+                    </Button>
+                  </TableHead>
+                  <TableHead>
+                    <Button variant="ghost" onClick={() => handleSort('created_date')} className="h-auto p-0 font-semibold">
+                      Date Applied <ArrowUpDown className="ml-1 h-3 w-3" />
+                    </Button>
+                  </TableHead>
+                  <TableHead>
+                    <Button variant="ghost" onClick={() => handleSort('status')} className="h-auto p-0 font-semibold">
+                      Status <ArrowUpDown className="ml-1 h-3 w-3" />
+                    </Button>
+                  </TableHead>
                   <TableHead>Action</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {applications.length > 0 ? (
-                  applications.map(app => {
+                {filteredAndSortedApplications.length > 0 ? (
+                  filteredAndSortedApplications.map(app => {
                     const statusInfo = statusMap[app.status] || statusMap.submitted;
                     return (
                       <TableRow key={app.id}>
                         <TableCell className="font-medium">{app.job_title}</TableCell>
                         <TableCell>{app.company_name}</TableCell>
-                        <TableCell>{format(new Date(app.created_date), 'MMM d, yyyy')}</TableCell>
+                        <TableCell>{formatTimestamp(app.created_date)}</TableCell>
                         <TableCell>
                           <Badge className={statusInfo.color}>
                             <statusInfo.icon className="mr-1.5 w-3 h-3" />
@@ -124,7 +194,7 @@ export default function TalentDashboard() {
                 ) : (
                   <TableRow>
                     <TableCell colSpan={5} className="h-24 text-center">
-                      You haven't applied to any jobs yet.
+                      {applications.length === 0 ? "You haven't applied to any jobs yet." : "No applications match your filters."}
                     </TableCell>
                   </TableRow>
                 )}

@@ -38,7 +38,7 @@ export default function Layout({ children, currentPageName }) {
       setIsLoading(false);
       return;
     }
-    
+
     if (user) {
       setIsLoading(false);
     } else {
@@ -49,8 +49,8 @@ export default function Layout({ children, currentPageName }) {
 
   const navItems = [
     { name: 'Browse Jobs', href: createPageUrl('Home'), icon: Briefcase },
-    { name: 'Talent Dashboard', href: createPageUrl('TalentDashboard'), icon: Users },
-    { name: 'Employer Dashboard', href: createPageUrl('EmployerDashboard'), icon: Building2 },
+    { name: 'Talent Dashboard', href: createPageUrl('Talent/Dashboard'), icon: Users },
+    { name: 'Employer Dashboard', href: createPageUrl('Employer/Dashboard'), icon: Building2 },
   ];
   const filteredNav = () => {
     if (!user) return navItems;
