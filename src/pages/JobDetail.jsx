@@ -305,7 +305,11 @@ export default function JobDetail() {
                   <span>Application Submitted</span>
                 </div>
               ) : (
-                <Button onClick={() => setShowApplication(true)} size="lg" disabled={isApplying}>
+                <Button
+                  onClick={() => setShowApplication(true)}
+                  size="lg"
+                  disabled={isApplying || !user || user.user_type !== 'talent'}
+                >
                   {isApplying ? 'Applying...' : 'Apply Now'}
                 </Button>
               )}

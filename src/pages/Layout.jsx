@@ -126,7 +126,7 @@ export default function Layout({ children, currentPageName }) {
                           </DropdownMenuItem>
                           {user.user_type === 'talent' && (
                             <DropdownMenuItem asChild>
-                              <Link to={createPageUrl('TalentDashboard')}>
+                              <Link to={createPageUrl('Talent/Dashboard')}>
                                 <Briefcase className="mr-2 w-4 h-4" />
                                 My Applications
                               </Link>
