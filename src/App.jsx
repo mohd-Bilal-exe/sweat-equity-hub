@@ -5,6 +5,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useEffect } from 'react';
 import { firebaseServices } from './api/firebase/services';
+import { analytics } from './api/firebase/analytics';
 import useUserStore from './api/zustand';
 
 function App() {

@@ -8,7 +8,8 @@ import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ApplicantList from '../components/employer/ApplicantList';
 import ApplicationPipeline from '../components/employer/ApplicationPipeline';
-import { Lock, CreditCard, ArrowLeft } from 'lucide-react';
+import { Lock, CreditCard, ArrowLeft, Tag } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { createPageUrl } from '@/utils';
 
 export default function ManageJob() {
@@ -125,10 +126,21 @@ export default function ManageJob() {
             <ArrowLeft className="mr-2 w-4 h-4" />
             Back to Dashboard
           </Button>
-          <h1 className="font-bold text-gray-900 text-3xl">Manage Applicants</h1>
-          <p className="text-gray-600">
-            Job: {job.title} • {applications.length} applications
-          </p>
+          <div className="flex items-center gap-3 mb-2">
+            <h1 className="font-bold text-gray-900 text-3xl">Manage Applicants</h1>
+            {job.category && (
+              <Badge variant="secondary" className="text-sm">
+                <Tag className="mr-1 w-4 h-4" />
+                {job.category}
+              </Badge>
+            )}
+          </div>
+          <div className="text-gray-600">
+            <div className="font-medium text-lg">{job.title}</div>
+            <div className="text-sm">
+              {job.location} • {job.remote_type} • {applications.length} applications
+            </div>
+          </div>
         </div>
 
         {error && (

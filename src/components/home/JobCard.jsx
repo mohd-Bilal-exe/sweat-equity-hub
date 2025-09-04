@@ -4,7 +4,7 @@ import { createPageUrl } from '@/utils';
 import { MapPin, Building2, Clock, ChevronRight, Zap, DollarSign, Tag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { formatDistanceToNow } from 'date-fns';
+import { formatTimestamp } from '@/utils/timestamp';
 
 export default function JobCard({ job, user }) {
   const [imageError, setImageError] = useState(false);
@@ -49,7 +49,7 @@ export default function JobCard({ job, user }) {
           </div>
           <div className="flex items-center">
             <Clock className="mr-1.5 w-4 h-4" />
-            <span>{formatDistanceToNow(new Date(job.created_date), { addSuffix: true })}</span>
+            <span>{formatTimestamp(job.createdAt || job.created_date, 'relative')}</span>
           </div>
         </div>
       </div>
@@ -68,7 +68,7 @@ export default function JobCard({ job, user }) {
               <span>
                 {typeof job.salary_amount === 'string' && job.salary_amount.startsWith('$')
                   ? job.salary_amount
-                  : `$${job.salary_amount}`}
+                  : `${job.salary_amount}`}
                 k
               </span>
             </div>
@@ -76,9 +76,7 @@ export default function JobCard({ job, user }) {
         </div>
         <div className="flex gap-2 w-full sm:w-auto">
           <Button variant="outline" size="sm" asChild>
-            <Link to={`${createPageUrl('JobDetail')}?id=${job.id}`}>
-              View Details
-            </Link>
+            <Link to={`${createPageUrl('JobDetail')}?id=${job.id}`}>View Details</Link>
           </Button>
           <Button size="sm" onClick={handleApply}>
             Apply Now

@@ -9,7 +9,9 @@ import { Badge } from '@/components/ui/badge';
 import JobCard from '../components/home/JobCard';
 import SearchFilters from '../components/home/SearchFilters';
 import { firebaseServices } from '@/api/firebase/services';
+import { analytics } from '@/api/firebase/analytics';
 import useUserStore from '@/api/zustand';
+import SEO from '@/components/SEO';
 
 export default function Home() {
   const [jobs, setJobs] = useState([]);
@@ -39,6 +41,7 @@ export default function Home() {
   };
   useEffect(() => {
     loadJobs();
+    analytics.trackPageView('Home');
   }, []);
 
   useEffect(() => {
@@ -129,7 +132,13 @@ export default function Home() {
   const uniqueLocations = [...new Set(jobs.map(job => job.location))].filter(Boolean);
 
   return (
-    <div className="bg-white min-h-screen">
+    <>
+      <SEO 
+        title="Find Your Dream Startup Job"
+        description="Discover equity-based opportunities at innovative startups. Connect with companies offering ownership, not just salary."
+        keywords="startup jobs, equity compensation, remote work, tech jobs, startup careers, job board"
+      />
+      <div className="bg-white min-h-screen">
       {/* Hero Section */}
       <section className="relative px-4 sm:px-6 lg:px-8 py-12">
         <div className="mx-auto max-w-4xl text-center">
@@ -156,7 +165,7 @@ export default function Home() {
                     className="bg-gray-50 pl-10 border-gray-200"
                   />
                 </div>
-                <Button>
+                <Button onClick={() => searchTerm && analytics.trackSearch(searchTerm)}>
                   <Search className="mr-2 w-4 h-4" />
                   Search
                 </Button>
@@ -263,6 +272,7 @@ export default function Home() {
           )}
         </div>
       </section>
-    </div>
+      </div>
+    </>
   );
 }

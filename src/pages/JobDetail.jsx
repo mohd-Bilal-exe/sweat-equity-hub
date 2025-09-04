@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { firebaseServices } from '@/api/firebase/services';
+import { analytics } from '@/api/firebase/analytics';
 import useUserStore from '@/api/zustand';
+import SEO from '@/components/SEO';
 import {
   MapPin,
   Building2,
@@ -12,12 +14,13 @@ import {
   ExternalLink,
   CheckCircle,
   AlertCircle,
+  Tag,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { format } from 'date-fns';
+import { formatTimestamp } from '@/utils/timestamp';
 import { createPageUrl } from '@/utils';
 
 export default function JobDetail() {
@@ -44,6 +47,7 @@ export default function JobDetail() {
       const jobData = await firebaseServices.getJob(jobId);
       if (jobData) {
         setJob(jobData);
+        analytics.trackJobView(jobId, jobData.title);
       }
     } catch (error) {
       console.error('Error loading job details:', error);
@@ -193,147 +197,175 @@ export default function JobDetail() {
   };
 
   return (
-    <div className="bg-gray-50 px-4 sm:px-6 lg:px-8 py-8">
-      <div className="mx-auto max-w-4xl">
-        <Button
-          onClick={() => (window.location.href = createPageUrl('Home'))}
-          variant="ghost"
-          className="mb-6 text-gray-600 hover:text-gray-900"
-        >
-          <ArrowLeft className="mr-2 w-4 h-4" />
-          Back to Jobs
-        </Button>
+    <>
+      {job && (
+        <SEO
+          title={`${job.title} at ${job.company_name}`}
+          description={`${job.title} position at ${job.company_name}. ${
+            job.equity_percentage ? `${job.equity_percentage}% equity` : ''
+          } ${job.salary_amount ? `$${job.salary_amount}k salary` : ''}. ${job.location} • ${
+            job.remote_type
+          }`}
+          keywords={`${job.title}, ${job.company_name}, ${job.category}, startup job, equity, ${job.location}`}
+        />
+      )}
+      <div className="bg-gray-50 px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mx-auto max-w-4xl">
+          <Button
+            onClick={() => (window.location.href = createPageUrl('Home'))}
+            variant="ghost"
+            className="mb-6 text-gray-600 hover:text-gray-900"
+          >
+            <ArrowLeft className="mr-2 w-4 h-4" />
+            Back to Jobs
+          </Button>
 
-        <div className="bg-white mb-8 p-8 border rounded-lg">
-          <div className="flex lg:flex-row flex-col lg:justify-between lg:items-start mb-6">
-            <div className="flex items-start space-x-4 mb-4 lg:mb-0">
-              {job.company_logo ? (
-                <img
-                  src={job.company_logo}
-                  alt={job.company_name}
-                  className="rounded-lg w-16 h-16 object-cover"
-                />
-              ) : (
-                <div className="flex justify-center items-center bg-gray-100 rounded-lg w-16 h-16">
-                  <Building2 className="w-8 h-8 text-gray-400" />
-                </div>
-              )}
-              <div>
-                <h1 className="mb-1 font-bold text-gray-900 text-2xl lg:text-3xl">{job.title}</h1>
-                <div className="flex items-center space-x-2 mb-2">
-                  <h2 className="font-medium text-gray-700 text-lg">{job.company_name}</h2>
-                  {job.company_website && (
-                    <a
-                      href={job.company_website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-gray-500 hover:text-indigo-600 transition-colors"
-                    >
-                      <ExternalLink className="w-4 h-4" />
-                    </a>
-                  )}
-                </div>
-                <div className="flex items-center text-gray-500 text-sm">
-                  <Calendar className="mr-1.5 w-4 h-4" />
-                  Posted {format(new Date(job.created_date), 'MMM d, yyyy')}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="gap-4 grid grid-cols-1 md:grid-cols-3 mb-6 pt-6 border-t">
-            <div className="flex items-center space-x-2 text-gray-600">
-              <MapPin className="w-5 h-5 text-gray-400" />
-              <span>
-                {job.location} • {job.remote_type}
-              </span>
-            </div>
-            {job.equity_details && (
-              <div className="flex items-center space-x-2 text-gray-600">
-                <Zap className="w-5 h-5 text-gray-400" />
-                <span>{job.equity_details}</span>
-              </div>
-            )}
-            {job.salary_range && (
-              <div className="flex items-center space-x-2 text-gray-600">
-                <Users className="w-5 h-5 text-gray-400" />
-                <span>{job.salary_range}</span>
-              </div>
-            )}
-          </div>
-
-          <div className="flex sm:flex-row flex-col gap-4">
-            {hasApplied ? (
-              <div className="flex items-center space-x-2 bg-green-50 px-4 py-2 border border-green-200 rounded-lg font-medium text-green-600">
-                <CheckCircle className="w-5 h-5" />
-                <span>Application Submitted</span>
-              </div>
-            ) : (
-              <Button onClick={() => setShowApplication(true)} size="lg" disabled={isApplying}>
-                {isApplying ? 'Applying...' : 'Apply Now'}
-              </Button>
-            )}
-          </div>
-        </div>
-
-        <div className="bg-white mb-8 p-8 border rounded-lg">
-          <h3 className="mb-4 font-bold text-gray-900 text-xl">Job Description</h3>
-          <div className="max-w-none text-gray-700 leading-relaxed whitespace-pre-line prose prose-gray">
-            {job.description}
-          </div>
-        </div>
-
-        {job.requirements && (
-          <div className="bg-white p-8 border rounded-lg">
-            <h3 className="mb-4 font-bold text-gray-900 text-xl">Requirements</h3>
-            <div className="max-w-none text-gray-700 leading-relaxed whitespace-pre-line prose prose-gray">
-              {job.requirements}
-            </div>
-          </div>
-        )}
-
-        {showApplication && (
-          <div className="z-50 fixed inset-0 flex justify-center items-center bg-black/30 backdrop-blur-sm p-4">
-            <div className="bg-white shadow-xl p-8 rounded-lg w-full max-w-md">
-              <h3 className="mb-4 font-bold text-gray-900 text-xl">Apply for {job.title}</h3>
-
-              {error && (
-                <Alert variant="destructive" className="mb-4">
-                  <AlertCircle className="w-4 h-4" />
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
-
-              <div className="space-y-4">
-                <div>
-                  <label className="block mb-2 font-medium text-gray-700 text-sm">
-                    Cover Message (Optional)
-                  </label>
-                  <Textarea
-                    placeholder="Tell the company why you're interested in this role..."
-                    value={coverMessage}
-                    onChange={e => setCoverMessage(e.target.value)}
-                    rows={4}
+          <div className="bg-white mb-8 p-8 border rounded-lg">
+            <div className="flex lg:flex-row flex-col lg:justify-between lg:items-start mb-6">
+              <div className="flex items-start space-x-4 mb-4 lg:mb-0">
+                {job.company_logo ? (
+                  <img
+                    src={job.company_logo}
+                    alt={job.company_name}
+                    className="rounded-lg w-16 h-16 object-cover"
                   />
-                </div>
-
-                <div className="flex space-x-4">
-                  <Button onClick={handleApply} disabled={isApplying} className="flex-1">
-                    {isApplying ? 'Submitting...' : 'Submit Application'}
-                  </Button>
-                  <Button
-                    onClick={() => setShowApplication(false)}
-                    variant="outline"
-                    className="flex-1"
-                  >
-                    Cancel
-                  </Button>
+                ) : (
+                  <div className="flex justify-center items-center bg-gray-100 rounded-lg w-16 h-16">
+                    <Building2 className="w-8 h-8 text-gray-400" />
+                  </div>
+                )}
+                <div>
+                  <div className="flex items-center gap-3 mb-2">
+                    <h1 className="font-bold text-gray-900 text-2xl lg:text-3xl">{job.title}</h1>
+                    {job.category && (
+                      <Badge
+                        variant="secondary"
+                        className={`text-sm capitalize ${
+                          categoryColors[job.category] || categoryColors.other
+                        }`}
+                      >
+                        <Tag className="mr-1 w-3 h-3" />
+                        {job.category}
+                      </Badge>
+                    )}
+                  </div>
+                  <div className="flex items-center space-x-2 mb-2">
+                    <h2 className="font-medium text-gray-700 text-lg">{job.company_name}</h2>
+                    {job.company_website && (
+                      <a
+                        href={job.company_website}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-gray-500 hover:text-indigo-600 transition-colors"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                      </a>
+                    )}
+                  </div>
+                  <div className="flex items-center text-gray-500 text-sm">
+                    <Calendar className="mr-1.5 w-4 h-4" />
+                    Posted {formatTimestamp(job.createdAt || job.created_date, 'medium')}
+                  </div>
                 </div>
               </div>
             </div>
+
+            <div className="gap-4 grid grid-cols-1 md:grid-cols-3 mb-6 pt-6 border-t">
+              <div className="flex items-center space-x-2 text-gray-600">
+                <MapPin className="w-5 h-5 text-gray-400" />
+                <span>
+                  {job.location} • {job.remote_type}
+                </span>
+              </div>
+              {job.equity_percentage && (
+                <div className="flex items-center space-x-2 text-gray-600">
+                  <Zap className="w-5 h-5 text-green-500" />
+                  <span className="font-medium text-green-600">
+                    {job.equity_percentage}% Equity
+                  </span>
+                </div>
+              )}
+              {job.salary_amount && (
+                <div className="flex items-center space-x-2 text-gray-600">
+                  <Users className="w-5 h-5 text-blue-500" />
+                  <span className="font-medium text-blue-600">${job.salary_amount}k Salary</span>
+                </div>
+              )}
+            </div>
+
+            <div className="flex sm:flex-row flex-col gap-4">
+              {hasApplied ? (
+                <div className="flex items-center space-x-2 bg-green-50 px-4 py-2 border border-green-200 rounded-lg font-medium text-green-600">
+                  <CheckCircle className="w-5 h-5" />
+                  <span>Application Submitted</span>
+                </div>
+              ) : (
+                <Button onClick={() => setShowApplication(true)} size="lg" disabled={isApplying}>
+                  {isApplying ? 'Applying...' : 'Apply Now'}
+                </Button>
+              )}
+            </div>
           </div>
-        )}
+
+          <div className="bg-white mb-8 p-8 border rounded-lg">
+            <h3 className="mb-4 font-bold text-gray-900 text-xl">Job Description</h3>
+            <div className="max-w-none text-gray-700 leading-relaxed whitespace-pre-line prose prose-gray">
+              {job.description}
+            </div>
+          </div>
+
+          {job.requirements && (
+            <div className="bg-white p-8 border rounded-lg">
+              <h3 className="mb-4 font-bold text-gray-900 text-xl">Requirements</h3>
+              <div className="max-w-none text-gray-700 leading-relaxed whitespace-pre-line prose prose-gray">
+                {job.requirements}
+              </div>
+            </div>
+          )}
+
+          {showApplication && (
+            <div className="z-50 fixed inset-0 flex justify-center items-center bg-black/30 backdrop-blur-sm p-4">
+              <div className="bg-white shadow-xl p-8 rounded-lg w-full max-w-md">
+                <h3 className="mb-4 font-bold text-gray-900 text-xl">Apply for {job.title}</h3>
+
+                {error && (
+                  <Alert variant="destructive" className="mb-4">
+                    <AlertCircle className="w-4 h-4" />
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
+                )}
+
+                <div className="space-y-4">
+                  <div>
+                    <label className="block mb-2 font-medium text-gray-700 text-sm">
+                      Cover Message (Optional)
+                    </label>
+                    <Textarea
+                      placeholder="Tell the company why you're interested in this role..."
+                      value={coverMessage}
+                      onChange={e => setCoverMessage(e.target.value)}
+                      rows={4}
+                    />
+                  </div>
+
+                  <div className="flex space-x-4">
+                    <Button onClick={handleApply} disabled={isApplying} className="flex-1">
+                      {isApplying ? 'Submitting...' : 'Submit Application'}
+                    </Button>
+                    <Button
+                      onClick={() => setShowApplication(false)}
+                      variant="outline"
+                      className="flex-1"
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
