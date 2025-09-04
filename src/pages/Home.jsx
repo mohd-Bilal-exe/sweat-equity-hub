@@ -241,6 +241,7 @@ export default function Home() {
                 <div className="space-y-6">
                   {filteredJobs.map(job => (
                     <Link
+                      key={job.id}
                       to={`${createPageUrl('JobDetail')}?id=${job.id}`}
                       className="group flex sm:flex-row flex-col items-start sm:items-center gap-6 bg-white hover:shadow-lg p-4 sm:p-6 border rounded-xl transition-shadow"
                     >

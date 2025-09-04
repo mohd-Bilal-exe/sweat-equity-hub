@@ -89,7 +89,7 @@ export default function JobCard({ job, user }) {
             </div>
           )}
         </div>
-        <div className="flex gap-2 w-full sm:w-auto">
+        <div className="hidden flex gap-2 w-full sm:w-auto">
           <Button variant="outline" size="sm" asChild>
             <Link to={`${createPageUrl('JobDetail')}?id=${job.id}`}>View Details</Link>
           </Button>

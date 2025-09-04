@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import {
@@ -33,6 +33,7 @@ export default function Layout({ children, currentPageName }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user } = useUserStore();
   const Navigate = useNavigate();
+  const mainRef = useRef();
   useEffect(() => {
     if (location.pathname === '/auth' || location.pathname === '/Auth') {
       setIsLoading(false);
@@ -46,7 +47,12 @@ export default function Layout({ children, currentPageName }) {
       Navigate(url);
     }
   }, [user, location.pathname, Navigate]);
-
+  useEffect(() => {
+    if (currentPageName) {
+      document.title = `sweatquity - ${currentPageName}`;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [currentPageName, location.pathname]);
   const navItems = [
     { name: 'Browse Jobs', href: createPageUrl('Home'), icon: Briefcase },
     { name: 'Talent Dashboard', href: createPageUrl('Talent/Dashboard'), icon: Users },
@@ -198,7 +204,7 @@ export default function Layout({ children, currentPageName }) {
       </nav>
 
       {/* Main Content */}
-      <main className="">{children}</main>
+      <main ref={mainRef}>{children}</main>
 
       {/* Footer */}
       <footer className="place-self-auto bg-gray-900 py-6 text-white">
@@ -232,9 +238,12 @@ export default function Layout({ children, currentPageName }) {
               <a href="#" className="text-gray-400 hover:text-white text-sm transition-colors">
                 Terms of Service
               </a>
-              <a href="#" className="text-gray-400 hover:text-white text-sm transition-colors">
+              <Link
+                to={createPageUrl('Contact')}
+                className="text-gray-400 hover:text-white text-sm transition-colors"
+              >
                 Contact
-              </a>
+              </Link>
             </div>
           </div>
 

@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import { Users, Edit, Trash2 } from 'lucide-react';
+import { formatTimestamp } from '@/utils/timestamp';
 
 export default function JobList({ jobs, deleteJob }) {
   return (
@@ -22,8 +23,15 @@ export default function JobList({ jobs, deleteJob }) {
               className="flex sm:flex-row flex-col justify-between items-start sm:items-center gap-4 p-4 border rounded-lg"
             >
               <div>
-                <h3 className="font-semibold text-lg">{job.title}</h3>
-                <p className="text-gray-500 text-sm">Posted on {job.created_date}</p>
+                <h3 className="font-semibold text-xl">{job.title}</h3>
+                {job.hasEdited ? (
+                  <p className="text-gray-500 text-xs"> Edited {formatTimestamp(job.editedAt)}</p>
+                ) : (
+                  <p className="text-gray-500 text-xs">
+                    Posted {formatTimestamp(job.created_date)}
+                  </p>
+                )}
+
                 <Badge variant={job.is_active ? 'default' : 'secondary'} className="mt-2">
                   {job.is_active ? 'Active' : 'Inactive'}
                 </Badge>

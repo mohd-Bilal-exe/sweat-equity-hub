@@ -18,6 +18,8 @@ import Pricing from './Pricing';
 
 import About from './About';
 
+import Contact from './Contact';
+
 import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 import AuthPage from './AuthPage.jsx';
 
@@ -39,6 +41,8 @@ const PAGES = {
   Pricing: Pricing,
 
   About: About,
+
+  Contact: Contact,
 };
 
 function _getCurrentPage(url) {
@@ -87,6 +91,8 @@ function PagesContent() {
         <Route path="/Pricing" element={<Pricing />} />
 
         <Route path="/About" element={<About />} />
+
+        <Route path="/Contact" element={<Contact />} />
       </Routes>
     </Layout>
   );

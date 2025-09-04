@@ -24,7 +24,7 @@ import {
 } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Switch } from '@/components/ui/switch';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, ArrowLeft } from 'lucide-react';
 import useUserStore from '@/api/zustand';
 import { firebaseServices } from '@/api/firebase/services';
 import { Timestamp } from 'firebase/firestore';
@@ -121,6 +121,8 @@ export default function PostJob() {
         company_name: user.company_name,
         company_logo: user.company_logo,
         is_active: true,
+        hasEdited: true,
+        editedAt: Timestamp.now(),
       };
 
       if (!isEditing) {
@@ -210,197 +212,221 @@ export default function PostJob() {
         }
         keywords="post job, hire talent, startup jobs, job posting, recruit, equity jobs"
       />
-      <div className="bg-gray-50 px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mx-auto max-w-4xl">
-          <form onSubmit={handleSubmit}>
-            <Card>
-              <CardHeader>
-                <CardTitle>{isEditing ? 'Edit Job' : 'Post a New Job'}</CardTitle>
-                <CardDescription>
-                  Fill in the details below to find your next great hire.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {error && (
-                  <Alert variant="destructive">
-                    <AlertCircle className="w-4 h-4" />
-                    <AlertDescription>
-                      {error}{' '}
-                      {error.includes('profile') && (
-                        <Link to={createPageUrl('Profile')} className="font-bold underline">
-                          Go to Profile
-                        </Link>
-                      )}
-                    </AlertDescription>
-                  </Alert>
-                )}
-
-                <div className="gap-6 grid grid-cols-1 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="title">Job Title</Label>
-                    <Input
-                      id="title"
-                      value={jobDetails.title}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="category">Job Category</Label>
-                    <Select
-                      onValueChange={v => handleSelectChange('category', v)}
-                      value={jobDetails.category}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select category" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {categories.map(cat => (
-                          <SelectItem key={cat} value={cat.toLowerCase()}>
-                            {cat}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <div className="gap-6 grid grid-cols-1 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="city">City</Label>
-                    <Input
-                      id="city"
-                      placeholder="e.g., San Francisco"
-                      value={jobDetails.city}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="country">Country</Label>
-                    <Select
-                      onValueChange={v => handleSelectChange('country', v)}
-                      value={jobDetails.country}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select country" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {countries.map(country => (
-                          <SelectItem key={country} value={country}>
-                            {country}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="description">Job Description</Label>
-                  <Textarea
-                    id="description"
-                    value={jobDetails.description}
-                    onChange={handleInputChange}
-                    rows={6}
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="requirements">Requirements</Label>
-                  <Textarea
-                    id="requirements"
-                    value={jobDetails.requirements}
-                    onChange={handleInputChange}
-                    rows={6}
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="remote_type">Work Type</Label>
-                  <Select
-                    onValueChange={v => handleSelectChange('remote_type', v)}
-                    value={jobDetails.remote_type}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {remoteTypes.map(t => (
-                        <SelectItem key={t.value} value={t.value}>
-                          {t.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Equity Percentage */}
-                <div className="space-y-4">
-                  <div className="flex items-center space-x-2">
-                    <Switch id="show-equity" checked={showEquity} onCheckedChange={setShowEquity} />
-                    <Label htmlFor="show-equity">Include Equity Details</Label>
-                  </div>
-
-                  {showEquity && (
-                    <div className="space-y-2">
-                      <Label htmlFor="equity_percentage">Equity Percentage (%)</Label>
-                      <Input
-                        id="equity_percentage"
-                        type="number"
-                        min="0"
-                        max="100"
-                        step="0.1"
-                        placeholder="e.g., 1.5"
-                        value={jobDetails.equity_percentage}
-                        onChange={e => handleNumberChange('equity_percentage', e.target.value)}
-                      />
-                    </div>
-                  )}
-                </div>
-
-                {/* Salary Amount */}
-                <div className="space-y-4">
-                  <div className="flex items-center space-x-2">
-                    <Switch id="show-salary" checked={showSalary} onCheckedChange={setShowSalary} />
-                    <Label htmlFor="show-salary">Include Salary Range</Label>
-                  </div>
-
-                  {showSalary && (
-                    <div className="space-y-2">
-                      <Label htmlFor="salary_amount">
-                        Salary Amount (in thousands, e.g., 150 for $150k)
-                      </Label>
-                      <Input
-                        id="salary_amount"
-                        type="number"
-                        min="0"
-                        placeholder="e.g., 150"
-                        value={jobDetails.salary_amount}
-                        onChange={e => handleNumberChange('salary_amount', e.target.value)}
-                      />
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-
-              <CardFooter>
-                <Button type="submit" disabled={isSaving || !!error}>
-                  {isSaving
-                    ? isEditing
-                      ? 'Updating Job...'
-                      : 'Posting Job...'
-                    : isEditing
-                    ? 'Update Job'
-                    : 'Post Job'}
-                </Button>
-              </CardFooter>
-            </Card>
-          </form>
+      {user.user_type !== 'employer' ? (
+        <div className="place-content-center grid w-full h-full">
+          <div className="flex flex-col justify-center bg-white min-w-xl item">
+            <Link to="/" className="flex gap-1 my-4">
+              <span className="flex gap-1 bg-black/20 p-2 rounded-xl">
+                {' '}
+                <ArrowLeft /> Home
+              </span>
+            </Link>
+            <h1 className="font-semibold text-3xl text-wrap">
+              Looks like you are not an employer.
+            </h1>
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="bg-gray-50 px-4 sm:px-6 lg:px-8 py-8">
+          <div className="mx-auto max-w-4xl">
+            <form onSubmit={handleSubmit}>
+              <Card>
+                <CardHeader>
+                  <CardTitle>{isEditing ? 'Edit Job' : 'Post a New Job'}</CardTitle>
+                  <CardDescription>
+                    Fill in the details below to find your next great hire.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {error && (
+                    <Alert variant="destructive">
+                      <AlertCircle className="w-4 h-4" />
+                      <AlertDescription>
+                        {error}{' '}
+                        {error.includes('profile') && (
+                          <Link to={createPageUrl('Profile')} className="font-bold underline">
+                            Go to Profile
+                          </Link>
+                        )}
+                      </AlertDescription>
+                    </Alert>
+                  )}
+
+                  <div className="gap-6 grid grid-cols-1 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="title">Job Title</Label>
+                      <Input
+                        id="title"
+                        value={jobDetails.title}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="category">Job Category</Label>
+                      <Select
+                        onValueChange={v => handleSelectChange('category', v)}
+                        value={jobDetails.category}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {categories.map(cat => (
+                            <SelectItem key={cat} value={cat.toLowerCase()}>
+                              {cat}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="gap-6 grid grid-cols-1 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="city">City</Label>
+                      <Input
+                        id="city"
+                        placeholder="e.g., San Francisco"
+                        value={jobDetails.city}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="country">Country</Label>
+                      <Select
+                        onValueChange={v => handleSelectChange('country', v)}
+                        value={jobDetails.country}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select country" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {countries.map(country => (
+                            <SelectItem key={country} value={country}>
+                              {country}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="description">Job Description</Label>
+                    <Textarea
+                      id="description"
+                      value={jobDetails.description}
+                      onChange={handleInputChange}
+                      rows={6}
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="requirements">Requirements</Label>
+                    <Textarea
+                      id="requirements"
+                      value={jobDetails.requirements}
+                      onChange={handleInputChange}
+                      rows={6}
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="remote_type">Work Type</Label>
+                    <Select
+                      onValueChange={v => handleSelectChange('remote_type', v)}
+                      value={jobDetails.remote_type}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {remoteTypes.map(t => (
+                          <SelectItem key={t.value} value={t.value}>
+                            {t.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Equity Percentage */}
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-2">
+                      <Switch
+                        id="show-equity"
+                        checked={showEquity}
+                        onCheckedChange={setShowEquity}
+                      />
+                      <Label htmlFor="show-equity">Include Equity Details</Label>
+                    </div>
+
+                    {showEquity && (
+                      <div className="space-y-2">
+                        <Label htmlFor="equity_percentage">Equity Percentage (%)</Label>
+                        <Input
+                          id="equity_percentage"
+                          type="number"
+                          min="0"
+                          max="100"
+                          step="0.1"
+                          placeholder="e.g., 1.5"
+                          value={jobDetails.equity_percentage}
+                          onChange={e => handleNumberChange('equity_percentage', e.target.value)}
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Salary Amount */}
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-2">
+                      <Switch
+                        id="show-salary"
+                        checked={showSalary}
+                        onCheckedChange={setShowSalary}
+                      />
+                      <Label htmlFor="show-salary">Include Salary Range</Label>
+                    </div>
+
+                    {showSalary && (
+                      <div className="space-y-2">
+                        <Label htmlFor="salary_amount">
+                          Salary Amount (in thousands, e.g., 150 for $150k)
+                        </Label>
+                        <Input
+                          id="salary_amount"
+                          type="number"
+                          min="0"
+                          placeholder="e.g., 150"
+                          value={jobDetails.salary_amount}
+                          onChange={e => handleNumberChange('salary_amount', e.target.value)}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+
+                <CardFooter>
+                  <Button type="submit" disabled={isSaving || !!error}>
+                    {isSaving
+                      ? isEditing
+                        ? 'Updating Job...'
+                        : 'Posting Job...'
+                      : isEditing
+                      ? 'Update Job'
+                      : 'Post Job'}
+                  </Button>
+                </CardFooter>
+              </Card>
+            </form>
+          </div>
+        </div>
+      )}
     </>
   );
 }

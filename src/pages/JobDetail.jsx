@@ -101,7 +101,7 @@ export default function JobDetail() {
     try {
       // Track application analytics
       analytics.trackJobApplication(jobId, job.title);
-      
+
       // Create the application with document references
       await firebaseServices.addJobApplication({
         job_id: jobId,
