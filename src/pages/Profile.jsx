@@ -4,6 +4,7 @@ import EmployerProfileForm from '../components/profile/EmployerProfileForm';
 import { Button } from '@/components/ui/button';
 import useUserStore from '@/api/zustand';
 import { firebaseServices } from '@/api/firebase/services';
+import { analytics } from '@/api/firebase/analytics';
 
 export default function ProfilePage() {
   const { user, updateUser } = useUserStore();
@@ -17,6 +18,7 @@ export default function ProfilePage() {
     } else {
       setIsLoading(false);
     }
+    analytics.trackPageView('Profile');
   }, [user]);
 
   const handleTypeSelection = async type => {

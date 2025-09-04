@@ -39,6 +39,8 @@ export default function JobDetail() {
     if (jobId) {
       loadJobDetails();
       checkApplicationStatus();
+      // Track page view for analytics
+      analytics.trackPageView(`Job Detail - ${jobId}`);
     }
   }, [jobId, user]);
 
@@ -97,6 +99,9 @@ export default function JobDetail() {
     setError(null);
 
     try {
+      // Track application analytics
+      analytics.trackJobApplication(jobId, job.title);
+      
       // Create the application with document references
       await firebaseServices.addJobApplication({
         job_id: jobId,

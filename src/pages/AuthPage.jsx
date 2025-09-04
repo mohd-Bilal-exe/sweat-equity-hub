@@ -1,6 +1,7 @@
 import { firebaseServices } from '@/api/firebase/services';
 import useUserStore from '@/api/zustand';
 import { createPageUrl } from '@/utils';
+import { analytics } from '@/api/firebase/analytics';
 import React, { useState, useEffect } from 'react';
 import { FcGoogle } from 'react-icons/fc';
 import { HiOutlineMail, HiOutlineLockClosed, HiEye, HiEyeOff } from 'react-icons/hi';
@@ -14,6 +15,10 @@ const AuthPage = () => {
   const [error, setError] = useState('');
   const { user } = useUserStore();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    analytics.trackPageView('Auth Page');
+  }, []);
 
   const getRedirectUrl = userData => {
     if (userData?.user_type === 'employer') {

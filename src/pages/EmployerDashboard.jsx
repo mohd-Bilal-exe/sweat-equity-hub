@@ -10,6 +10,7 @@ import PaymentHistory from '../components/employer/PaymentHistory';
 import EmployerDashboardStats from '../components/employer/DashboardStats';
 import useUserStore from '@/api/zustand';
 import { firebaseServices } from '@/api/firebase/services';
+import { analytics } from '@/api/firebase/analytics';
 
 export default function EmployerDashboard() {
   const { user } = useUserStore();
@@ -20,6 +21,7 @@ export default function EmployerDashboard() {
 
   useEffect(() => {
     fetchData();
+    analytics.trackPageView('Employer Dashboard');
   }, [user]);
 
   const fetchData = async () => {

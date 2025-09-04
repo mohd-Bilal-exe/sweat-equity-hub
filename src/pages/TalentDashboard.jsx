@@ -18,6 +18,7 @@ import { FileText, Eye, XCircle, Handshake, Award, ArrowUpDown } from 'lucide-re
 import TalentDashboardStats from '../components/talent/DashboardStats';
 import useUserStore from '@/api/zustand';
 import { firebaseServices } from '@/api/firebase/services';
+import { analytics } from '@/api/firebase/analytics';
 import { formatTimestamp } from '@/utils/timestamp';
 
 export default function TalentDashboard() {
@@ -31,6 +32,7 @@ export default function TalentDashboard() {
 
   useEffect(() => {
     fetchApplications();
+    analytics.trackPageView('Talent Dashboard');
   }, [user]);
 
   const fetchApplications = async () => {
