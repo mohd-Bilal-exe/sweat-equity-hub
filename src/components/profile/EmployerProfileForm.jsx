@@ -20,8 +20,10 @@ import {
 } from '@/components/ui/select';
 import { Upload, LinkIcon, Trash2 } from 'lucide-react';
 import { firebaseServices } from '@/api/firebase/services';
+import { useNavigate } from 'react-router-dom';
 
 export default function EmployerProfileForm({ user }) {
+  const Navigate = useNavigate();
   const [profile, setProfile] = useState({
     company_name: user.company_name || '',
     company_logo: user.company_logo || '',
@@ -83,7 +85,9 @@ export default function EmployerProfileForm({ user }) {
 
     try {
       await firebaseServices.updateUser(user.uid, dataToSave);
-      alert('Profile updated successfully!');
+      setTimeout(() => {
+        Navigate('/employer/dashboard');
+      }, 1500);
     } catch (error) {
       console.error('Error updating profile:', error);
       alert('Failed to update profile.');
@@ -153,7 +157,7 @@ export default function EmployerProfileForm({ user }) {
               <LinkIcon className="mr-2 w-5 h-5 text-gray-400" />
               <Input
                 id="company_website"
-                type="url"
+                type="text"
                 placeholder="https://yourcompany.com"
                 value={profile.company_website}
                 onChange={handleInputChange}

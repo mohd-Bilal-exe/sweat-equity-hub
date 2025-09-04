@@ -1,74 +1,75 @@
-import { firebaseServices } from '@/api/firebase/services'
-import useUserStore from '@/api/zustand'
-import { createPageUrl } from '@/utils'
-import React, { useState, useEffect } from 'react'
-import { FcGoogle } from 'react-icons/fc'
-import { HiOutlineMail, HiOutlineLockClosed, HiEye, HiEyeOff } from 'react-icons/hi'
-import { useNavigate } from 'react-router-dom'
-
+import { firebaseServices } from '@/api/firebase/services';
+import useUserStore from '@/api/zustand';
+import { createPageUrl } from '@/utils';
+import React, { useState, useEffect } from 'react';
+import { FcGoogle } from 'react-icons/fc';
+import { HiOutlineMail, HiOutlineLockClosed, HiEye, HiEyeOff } from 'react-icons/hi';
+import { useNavigate } from 'react-router-dom';
 
 const AuthPage = () => {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const { user } = useUserStore()
-  const navigate = useNavigate()
-  
-  const getRedirectUrl = (userData) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const { user } = useUserStore();
+  const navigate = useNavigate();
+
+  const getRedirectUrl = userData => {
     if (userData?.user_type === 'employer') {
-      return createPageUrl('EmployerDashboard')
+      return createPageUrl('EmployerDashboard');
     } else if (userData?.user_type === 'talent') {
-      return createPageUrl('TalentDashboard')
+      return createPageUrl('TalentDashboard');
     }
-    return createPageUrl('Profile')
-  }
-  
+    return createPageUrl('Profile');
+  };
+
   useEffect(() => {
     if (user) {
-      navigate(getRedirectUrl(user))
+      navigate(getRedirectUrl(user));
     }
-  }, [user, navigate])
+  }, [user, navigate]);
   const handleAuth = async () => {
-    setLoading(true)
-    setError('')
+    setLoading(true);
+    setError('');
     try {
-      const userData = await firebaseServices.signInWithEmail(email, password)
-      navigate(getRedirectUrl(userData))
+      const userData = await firebaseServices.signInWithEmail(email, password);
+      navigate(getRedirectUrl(userData));
     } catch {
       try {
-        const userData = await firebaseServices.signUpWithEmail(email, password)
-        await firebaseServices.createUser(userData)
-        navigate(getRedirectUrl(userData))
+        const userData = await firebaseServices.signUpWithEmail(email, password);
+        await firebaseServices.createUser(userData);
+        navigate(getRedirectUrl(userData));
       } catch (err) {
-        setError(err.message)
+        setError(err.message);
       }
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleGoogleLogin = async () => {
-    setLoading(true)
-    setError('')
+    setLoading(true);
+    setError('');
     try {
-      const userData = await firebaseServices.signInWithGoogle()
-      navigate(getRedirectUrl(userData))
+      const userData = await firebaseServices.signInWithGoogle();
+      navigate(getRedirectUrl(userData));
     } catch (err) {
-      setError(err.message)
+      setError(err.message);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="flex justify-center items-center bg-gradient-to-br from-gray-100 to-gray-300 px-4 min-h-screen">
       <div className="bg-white shadow-xl p-8 rounded-xl w-full max-w-md animate-fade-in">
-        <h2 className="mb-6 font-semibold text-gray-800 text-2xl text-center">
-          {user ? `Welcome, ${user.displayName || user.email}` : 'Login / Signup'}
+        <h2 className="font-semibold text-gray-800 text-2xl text-center">
+          {user ? `Welcome, ${user.displayName || user.email}` : 'Get Started'}
         </h2>
-
+        <h2 className="mb-6 font-semibold text-gray-400 text-sm text-center">
+          {user ? `` : 'or continue'}
+        </h2>
         {!user && (
           <>
             <div className="relative mb-4">
@@ -77,7 +78,7 @@ const AuthPage = () => {
                 type="email"
                 placeholder="Email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={e => setEmail(e.target.value)}
                 className="py-2 pr-4 pl-10 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 w-full"
               />
             </div>
@@ -88,7 +89,7 @@ const AuthPage = () => {
                 type={showPassword ? 'text' : 'password'}
                 placeholder="Password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={e => setPassword(e.target.value)}
                 className="py-2 pr-10 pl-10 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 w-full"
               />
               <button
@@ -103,7 +104,7 @@ const AuthPage = () => {
             <button
               onClick={handleAuth}
               disabled={loading}
-              className="bg-blue-600 hover:bg-blue-700 py-2 rounded-md w-full text-white transition duration-200"
+              className="bg-black/80 hover:bg-black py-2 rounded-md w-full text-white transition duration-200"
             >
               {loading ? 'Processing...' : 'Continue'}
             </button>
@@ -120,7 +121,7 @@ const AuthPage = () => {
               className="flex justify-center items-center gap-2 hover:bg-gray-100 py-2 border rounded-md w-full transition duration-200"
             >
               <FcGoogle className="text-xl" />
-              <span>Sign in with Google</span>
+              <span>Continue in with Google</span>
             </button>
 
             {error && <p className="mt-4 text-red-500 text-sm text-center">{error}</p>}
@@ -128,7 +129,7 @@ const AuthPage = () => {
         )}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default AuthPage
+export default AuthPage;

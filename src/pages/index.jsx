@@ -76,9 +76,9 @@ function PagesContent() {
 
         <Route path="/Profile" element={<Profile />} />
 
-        <Route path="/TalentDashboard" element={<TalentDashboard />} />
+        <Route path="/Talent/Dashboard" element={<TalentDashboard />} />
 
-        <Route path="/EmployerDashboard" element={<EmployerDashboard />} />
+        <Route path="/Employer/Dashboard" element={<EmployerDashboard />} />
 
         <Route path="/PostJob" element={<PostJob />} />
         <Route path="/PostJob/:id" element={<PostJob />} />

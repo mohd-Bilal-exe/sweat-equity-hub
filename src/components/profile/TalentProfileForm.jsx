@@ -12,8 +12,10 @@ import {
 } from '@/components/ui/card';
 import { Upload, Linkedin, Github, FileText, Trash2 } from 'lucide-react';
 import { firebaseServices } from '@/api/firebase/services';
+import { useNavigate } from 'react-router-dom';
 
 export default function TalentProfileForm({ user }) {
+  const Navigate = useNavigate();
   const [profile, setProfile] = useState({
     full_name: user.full_name || '',
     location: user.location || '',
@@ -71,7 +73,9 @@ export default function TalentProfileForm({ user }) {
 
     try {
       await firebaseServices.updateUser(user.uid, dataToSave);
-      alert('Profile updated successfully!');
+      setTimeout(() => {
+        Navigate('/talent/dashboard');
+      }, 1500);
     } catch (error) {
       console.error('Error updating profile:', error);
       alert('Failed to update profile.');
@@ -122,7 +126,7 @@ export default function TalentProfileForm({ user }) {
               <Linkedin className="mr-2 w-5 h-5 text-gray-400" />
               <Input
                 id="linkedin_url"
-                type="url"
+                type="text"
                 placeholder="https://linkedin.com/in/yourprofile"
                 value={profile.linkedin_url}
                 onChange={handleInputChange}
@@ -135,7 +139,7 @@ export default function TalentProfileForm({ user }) {
               <Github className="mr-2 w-5 h-5 text-gray-400" />
               <Input
                 id="github_url"
-                type="url"
+                type="text"
                 placeholder="https://github.com/yourusername or portfolio link"
                 value={profile.github_url}
                 onChange={handleInputChange}
