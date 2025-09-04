@@ -17,24 +17,24 @@ const AuthPage = () => {
 
   const getRedirectUrl = userData => {
     if (userData?.user_type === 'employer') {
-      return createPageUrl('EmployerDashboard');
+      return createPageUrl('Employer/Dashboard');
     } else if (userData?.user_type === 'talent') {
-      return createPageUrl('TalentDashboard');
+      return createPageUrl('Talent/Dashboard');
     }
     return createPageUrl('Profile');
   };
 
-  useEffect(() => {
+  /*useEffect(() => {
     if (user) {
       navigate(getRedirectUrl(user));
     }
-  }, [user, navigate]);
+  }, [user, navigate]);*/
   const handleAuth = async () => {
     setLoading(true);
     setError('');
     try {
       const userData = await firebaseServices.signInWithEmail(email, password);
-      navigate(getRedirectUrl(userData));
+      userData && navigate(getRedirectUrl(userData));
     } catch {
       try {
         const userData = await firebaseServices.signUpWithEmail(email, password);
@@ -53,7 +53,7 @@ const AuthPage = () => {
     setError('');
     try {
       const userData = await firebaseServices.signInWithGoogle();
-      navigate(getRedirectUrl(userData));
+      userData && navigate(getRedirectUrl(userData));
     } catch (err) {
       setError(err.message);
     } finally {

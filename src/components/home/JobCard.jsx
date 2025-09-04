@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { MapPin, Building2, Clock, ChevronRight, Zap, DollarSign } from 'lucide-react';
+import { MapPin, Building2, Clock, ChevronRight, Zap, DollarSign, Tag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { formatDistanceToNow } from 'date-fns';
 
 export default function JobCard({ job, user }) {
@@ -27,7 +28,15 @@ export default function JobCard({ job, user }) {
       </div>
 
       <div className="flex-grow">
-        <p className="font-medium text-indigo-600 text-sm">{job.company_name}</p>
+        <div className="flex items-center gap-2 mb-1">
+          <p className="font-medium text-indigo-600 text-sm">{job.company_name}</p>
+          {job.category && (
+            <Badge variant="secondary" className="text-xs">
+              <Tag className="mr-1 w-3 h-3" />
+              {job.category}
+            </Badge>
+          )}
+        </div>
         <h4 className="font-bold text-gray-900 hover:text-indigo-700 text-lg transition-colors">
           <Link to={`${createPageUrl('JobDetail')}?id=${job.id}`}>{job.title}</Link>
         </h4>
@@ -35,12 +44,12 @@ export default function JobCard({ job, user }) {
           <div className="flex items-center">
             <MapPin className="mr-1.5 w-4 h-4" />
             <span>
-              {job.location} ({job.remote_type})
+              {job.location} • {job.remote_type}
             </span>
           </div>
           <div className="flex items-center">
             <Clock className="mr-1.5 w-4 h-4" />
-            <span>{job.created_date}</span>
+            <span>{formatDistanceToNow(new Date(job.created_date), { addSuffix: true })}</span>
           </div>
         </div>
       </div>

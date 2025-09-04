@@ -39,7 +39,9 @@ export default function PostJob() {
     title: '',
     description: '',
     requirements: '',
-    location: '',
+    city: '',
+    country: '',
+    category: '',
     remote_type: 'onsite',
     equity_percentage: '',
     salary_amount: '',
@@ -58,7 +60,9 @@ export default function PostJob() {
           title: job.title || '',
           description: job.description || '',
           requirements: job.requirements || '',
-          location: job.location || '',
+          city: job.city || job.location || '',
+          country: job.country || '',
+          category: job.category || '',
           remote_type: job.remote_type || 'onsite',
           equity_percentage: job.equity_percentage || '',
           salary_amount: job.salary_amount || '',
@@ -109,6 +113,7 @@ export default function PostJob() {
     try {
       const jobData = {
         ...jobDetails,
+        location: `${jobDetails.city}, ${jobDetails.country}`,
         equity_percentage: showEquity ? jobDetails.equity_percentage : null,
         salary_amount: showSalary ? jobDetails.salary_amount : null,
         company_id: user.uid,
@@ -128,7 +133,7 @@ export default function PostJob() {
         await firebaseServices.addJob(jobData);
       }
 
-      navigate(createPageUrl('EmployerDashboard'));
+      navigate(createPageUrl('Employer/Dashboard'));
     } catch (err) {
       setError(
         `Failed to ${isEditing ? 'update' : 'post'} job. Please check your details and try again.`
@@ -143,6 +148,55 @@ export default function PostJob() {
     { value: 'onsite', label: 'On-site' },
     { value: 'remote', label: 'Remote' },
     { value: 'hybrid', label: 'Hybrid' },
+  ];
+
+  const countries = [
+    'United States',
+    'Canada',
+    'United Kingdom',
+    'Germany',
+    'France',
+    'Australia',
+    'Netherlands',
+    'Sweden',
+    'Switzerland',
+    'Singapore',
+    'Japan',
+    'South Korea',
+    'India',
+    'Brazil',
+    'Mexico',
+    'Spain',
+    'Italy',
+    'Poland',
+    'Czech Republic',
+    'Denmark',
+    'Norway',
+    'Finland',
+    'Austria',
+    'Belgium',
+    'Ireland',
+    'New Zealand',
+  ];
+
+  const categories = [
+    'Engineering',
+    'Design',
+    'Product',
+    'Marketing',
+    'Sales',
+    'Operations',
+    'Finance',
+    'Legal',
+    'HR',
+    'Customer Success',
+    'Data Science',
+    'DevOps',
+    'Security',
+    'QA',
+    'Business Development',
+    'Content',
+    'Other',
   ];
 
   return (
@@ -182,14 +236,53 @@ export default function PostJob() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="location">Location</Label>
+                  <Label htmlFor="category">Job Category</Label>
+                  <Select
+                    onValueChange={v => handleSelectChange('category', v)}
+                    value={jobDetails.category}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categories.map(cat => (
+                        <SelectItem key={cat} value={cat.toLowerCase()}>
+                          {cat}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="gap-6 grid grid-cols-1 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="city">City</Label>
                   <Input
-                    id="location"
-                    placeholder="e.g., San Francisco, CA"
-                    value={jobDetails.location}
+                    id="city"
+                    placeholder="e.g., San Francisco"
+                    value={jobDetails.city}
                     onChange={handleInputChange}
                     required
                   />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="country">Country</Label>
+                  <Select
+                    onValueChange={v => handleSelectChange('country', v)}
+                    value={jobDetails.country}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select country" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {countries.map(country => (
+                        <SelectItem key={country} value={country}>
+                          {country}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 
