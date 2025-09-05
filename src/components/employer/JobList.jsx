@@ -5,10 +5,10 @@ import { Card, CardHeader, CardContent, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
-import { Users, Edit, Trash2 } from 'lucide-react';
+import { Users, Edit, Trash2, Loader } from 'lucide-react';
 import { formatTimestamp } from '@/utils/timestamp';
 
-export default function JobList({ jobs, deleteJob }) {
+export default function JobList({ jobs, deleteJob, isDeleting }) {
   return (
     <Card>
       <CardHeader>
@@ -49,7 +49,11 @@ export default function JobList({ jobs, deleteJob }) {
                   </Link>
                 </Button>
                 <Button variant="ghost" size="icon" onClick={() => deleteJob(job.id)}>
-                  <Trash2 className="w-4 h-4 text-red-500" />
+                  {isDeleting ? (
+                    <Loader className="w-4 h-4 text-red-500 animate-spin" />
+                  ) : (
+                    <Trash2 className="w-4 h-4 text-red-500" />
+                  )}
                 </Button>
               </div>
             </div>

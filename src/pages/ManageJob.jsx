@@ -119,7 +119,7 @@ export default function ManageJob() {
       <div className="mx-auto max-w-7xl">
         <div className="mb-8">
           <Button
-            onClick={() => (window.location.href = createPageUrl('EmployerDashboard'))}
+            onClick={() => (window.location.href = createPageUrl('Employer/Dashboard'))}
             variant="ghost"
             className="mb-4 text-gray-600 hover:text-gray-900"
           >

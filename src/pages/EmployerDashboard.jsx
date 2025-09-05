@@ -11,6 +11,7 @@ import EmployerDashboardStats from '../components/employer/DashboardStats';
 import useUserStore from '@/api/zustand';
 import { firebaseServices } from '@/api/firebase/services';
 import { analytics } from '@/api/firebase/analytics';
+import { set } from 'date-fns';
 
 export default function EmployerDashboard() {
   const { user } = useUserStore();
@@ -18,7 +19,7 @@ export default function EmployerDashboard() {
   const [payments, setPayments] = useState([]);
   const [applications, setApplications] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-
+  const [isDeleting, setIsDeleting] = useState(false);
   useEffect(() => {
     fetchData();
     analytics.trackPageView('Employer Dashboard');
@@ -47,10 +48,12 @@ export default function EmployerDashboard() {
           : [];
       setPayments(userPayments.filter(Boolean));
 
+      // Extract applications from all user jobs
+      const allApplicationRefs = userJobs.filter(Boolean).flatMap(job => job.applications || []);
       const userApplications =
-        user.applications?.length > 0
+        allApplicationRefs.length > 0
           ? await Promise.all(
-              user.applications.map(ref => (ref ? firebaseServices.getDocument(ref) : null))
+              allApplicationRefs.map(ref => (ref ? firebaseServices.getDocument(ref) : null))
             )
           : [];
       setApplications(userApplications.filter(Boolean));
@@ -69,12 +72,18 @@ export default function EmployerDashboard() {
       alert('Sign in to manage jobs');
       return;
     }
-    if (confirm('Are you sure you want to delete this job posting?')) {
+    if (
+      confirm(
+        'Are you sure you want to delete this job posting? This will also remove all applications.'
+      )
+    ) {
       try {
-        await Job.delete(jobId);
+        setIsDeleting(true);
+        await firebaseServices.deleteJob(jobId);
+        setIsDeleting(false);
         fetchData();
       } catch (e) {
-        alert('Failed to delete job.');
+        console.error('Error deleting job:', e);
       }
     }
   };
@@ -115,7 +124,7 @@ export default function EmployerDashboard() {
             <TabsTrigger value="payments">Payment History</TabsTrigger>
           </TabsList>
           <TabsContent value="jobs">
-            <JobList jobs={jobs} deleteJob={deleteJob} />
+            <JobList jobs={jobs} deleteJob={deleteJob} isDeleting={isDeleting} />
             {!user && (
               <Card className="bg-blue-50 mt-6 border-blue-200">
                 <CardContent className="p-6 text-center">
