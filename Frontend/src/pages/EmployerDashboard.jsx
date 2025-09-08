@@ -8,10 +8,13 @@ import { Plus } from 'lucide-react';
 import JobList from '../components/employer/JobList';
 import PaymentHistory from '../components/employer/PaymentHistory';
 import EmployerDashboardStats from '../components/employer/DashboardStats';
+import SubscriptionBanner from '../components/employer/SubscriptionBanner';
 import useUserStore from '@/api/zustand';
 import { firebaseServices } from '@/api/firebase/services';
 import { analytics } from '@/api/firebase/analytics';
-import { set } from 'date-fns';
+import { backendAPI } from '@/api/backend';
+import { getAuth } from 'firebase/auth';
+import StripeCheckout from '../components/payment/StripeCheckout';
 
 export default function EmployerDashboard() {
   const { user } = useUserStore();
@@ -20,10 +23,62 @@ export default function EmployerDashboard() {
   const [applications, setApplications] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [subscription, setSubscription] = useState({ isActive: false });
+  const [showCheckout, setShowCheckout] = useState(false);
   useEffect(() => {
     fetchData();
+    checkSubscription();
     analytics.trackPageView('Employer Dashboard');
   }, [user]);
+
+  const checkSubscription = async () => {
+    if (!user?.uid) return;
+    
+    try {
+      const auth = getAuth();
+      if (!auth.currentUser) {
+        console.log('No authenticated user found');
+        return;
+      }
+      
+      const token = await auth.currentUser.getIdToken();
+      if (!token) {
+        console.log('No token retrieved');
+        return;
+      }
+      
+      const result = await backendAPI.getSubscriptionStatus(user.uid, token);
+      setSubscription(result.subscription);
+    } catch (error) {
+      console.error('Subscription check error:', error);
+      // Set default subscription state on error
+      setSubscription({ isActive: false });
+    }
+  };
+
+  const isSubscriptionValid = (subscription) => {
+    if (!subscription.isActive) return false;
+    if (!subscription.expiresAt) return false;
+    
+    const expiryDate = subscription.expiresAt.toDate ? subscription.expiresAt.toDate() : new Date(subscription.expiresAt);
+    return new Date() < expiryDate;
+  };
+
+  const limitApplications = (applications) => {
+    // Security check: validate subscription on client side
+    if (isSubscriptionValid(subscription)) return applications;
+    
+    // Group applications by job and limit to 3 per job
+    const jobGroups = {};
+    applications.forEach(app => {
+      if (!jobGroups[app.job_id]) jobGroups[app.job_id] = [];
+      if (jobGroups[app.job_id].length < 3) {
+        jobGroups[app.job_id].push(app);
+      }
+    });
+    
+    return Object.values(jobGroups).flat();
+  };
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -56,7 +111,8 @@ export default function EmployerDashboard() {
               allApplicationRefs.map(ref => (ref ? firebaseServices.getDocument(ref) : null))
             )
           : [];
-      setApplications(userApplications.filter(Boolean));
+      const filteredApplications = userApplications.filter(Boolean);
+      setApplications(limitApplications(filteredApplications));
     } catch (error) {
       console.error('Error fetching data:', error);
       setJobs([]);
@@ -88,6 +144,20 @@ export default function EmployerDashboard() {
     }
   };
 
+  const handleSubscribe = () => {
+    if (!user) {
+      alert('Please sign in to subscribe');
+      return;
+    }
+    setShowCheckout(true);
+  };
+
+  const handlePaymentSuccess = () => {
+    setShowCheckout(false);
+    checkSubscription(); // Refresh subscription status
+    alert('Subscription activated successfully!');
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center bg-gray-50 h-screen">
@@ -116,6 +186,18 @@ export default function EmployerDashboard() {
           </Button>
         </div>
 
+        {user && <SubscriptionBanner subscription={subscription} onSubscribe={handleSubscribe} />}
+        
+        {showCheckout && (
+          <div className="z-50 fixed inset-0 flex justify-center items-center bg-black/50 p-4">
+            <StripeCheckout 
+              userId={user.uid}
+              onSuccess={handlePaymentSuccess}
+              onCancel={() => setShowCheckout(false)}
+            />
+          </div>
+        )}
+        
         <EmployerDashboardStats jobs={jobs} applications={applications} />
 
         <Tabs defaultValue="jobs">

@@ -78,7 +78,7 @@ export default function Layout({ children, currentPageName }) {
             {/* Logo */}
             <Link to={createPageUrl('Home')} className="flex items-center space-x-2">
               <div className="flex justify-center items-center rounded-lg w-8 h-8">
-                <img src="/logoDark.jpg" className="rounded-xl overflow-hidden" />
+                <img src="/SweatEquityLogo-new.jpg" className="rounded-xl overflow-hidden" />
               </div>
               <span className="font-bold text-gray-900 text-xl">sweatquity</span>
             </Link>
@@ -213,7 +213,7 @@ export default function Layout({ children, currentPageName }) {
             {/* Logo */}
             <div className="flex items-center space-x-2">
               <div className="flex justify-center items-center bg-white rounded-lg w-8 h-8">
-                <img src="/logoDark.jpg" className="rounded-xl overflow-hidden" />
+                <img src="/SweatEquityLogo-new.jpg" className="rounded-xl overflow-hidden" />
               </div>
               <span className="font-bold text-xl">sweatquity</span>
             </div>

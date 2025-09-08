@@ -3,6 +3,8 @@ const convertToDate = (timestamp) => {
 
   if (timestamp.toDate && typeof timestamp.toDate === 'function') {
     return timestamp.toDate(); // Firebase Timestamp
+  } else if (timestamp._seconds !== undefined && timestamp._nanoseconds !== undefined) {
+    return new Date(timestamp._seconds * 1000); // Serialized Firebase Timestamp with _seconds
   } else if (timestamp.seconds !== undefined && timestamp.nanoseconds !== undefined) {
     return new Date(timestamp.seconds * 1000); // Serialized Firebase Timestamp
   } else if (timestamp instanceof Date) {
@@ -98,4 +100,14 @@ export const formatRelativeGap = (timestamps) => {
   }
 
   return result;
+};
+
+export const getDaysUntilExpiry = (timestamp) => {
+  if (!timestamp) return 0;
+  const expiryDate = convertToDate(timestamp);
+  if (!expiryDate) return 0;
+  
+  const now = new Date();
+  const diffTime = expiryDate - now;
+  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 };
