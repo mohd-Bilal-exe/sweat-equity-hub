@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { formatTimestamp } from '@/utils/timestamp';
@@ -161,10 +162,45 @@ export default function JobDetail() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center bg-gray-50 min-h-screen">
-        <div className="bg-white p-8 border rounded-lg text-center">
-          <div className="mx-auto border-gray-900 border-b-2 rounded-full w-12 h-12 animate-spin"></div>
-          <p className="mt-4 text-gray-600">Loading job details...</p>
+      <div className="bg-gray-50 px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mx-auto max-w-4xl">
+          <Skeleton className="h-10 w-32 mb-6" />
+          
+          <div className="bg-white mb-8 p-8 border rounded-lg">
+            <div className="flex items-start space-x-4 mb-6">
+              <Skeleton className="w-16 h-16 rounded-lg" />
+              <div className="flex-1">
+                <Skeleton className="h-8 w-64 mb-2" />
+                <Skeleton className="h-6 w-48 mb-2" />
+                <Skeleton className="h-4 w-32" />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 pt-6 border-t">
+              <Skeleton className="h-6 w-full" />
+              <Skeleton className="h-6 w-full" />
+              <Skeleton className="h-6 w-full" />
+            </div>
+            
+            <Skeleton className="h-12 w-32" />
+          </div>
+          
+          <div className="bg-white mb-8 p-8 border rounded-lg">
+            <Skeleton className="h-6 w-48 mb-4" />
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-3/4" />
+            </div>
+          </div>
+          
+          <div className="bg-white p-8 border rounded-lg">
+            <Skeleton className="h-6 w-32 mb-4" />
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-5/6" />
+            </div>
+          </div>
         </div>
       </div>
     );
