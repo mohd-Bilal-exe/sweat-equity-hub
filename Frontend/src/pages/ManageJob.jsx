@@ -5,6 +5,7 @@ import { firebaseServices } from '@/api/firebase/services';
 import useUserStore from '@/api/zustand';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ApplicantList from '../components/employer/ApplicantList';
 import ApplicationPipeline from '../components/employer/ApplicationPipeline';
@@ -23,6 +24,7 @@ export default function ManageJob() {
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [updatingStatus, setUpdatingStatus] = useState(null);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -94,18 +96,47 @@ export default function ManageJob() {
   };
 
   const updateApplicationStatus = async (applicationId, newStatus) => {
+    setUpdatingStatus(applicationId);
     try {
       await firebaseServices.updateJobApplication(applicationId, { status: newStatus });
       await fetchData(); // Refresh data
     } catch (error) {
       console.error('Error updating application status:', error);
+    } finally {
+      setUpdatingStatus(null);
     }
   };
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center bg-gray-50 h-screen">
-        <div className="border-gray-900 border-b-2 rounded-full w-12 h-12 animate-spin"></div>
+      <div className="bg-gray-50 px-4 sm:px-6 lg:px-8 py-8 h-full">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-8">
+            <Skeleton className="h-10 w-32 mb-4" />
+            <div className="flex items-center gap-3 mb-2">
+              <Skeleton className="h-8 w-64" />
+              <Skeleton className="h-6 w-20" />
+            </div>
+            <div className="space-y-2">
+              <Skeleton className="h-6 w-48" />
+              <Skeleton className="h-4 w-64" />
+            </div>
+          </div>
+          
+          <div className="mb-6">
+            <Skeleton className="h-20 w-full" />
+          </div>
+          
+          <div className="mb-4">
+            <Skeleton className="h-10 w-full max-w-md" />
+          </div>
+          
+          <div className="space-y-4">
+            <Skeleton className="h-32 w-full" />
+            <Skeleton className="h-32 w-full" />
+            <Skeleton className="h-32 w-full" />
+          </div>
+        </div>
       </div>
     );
   }
@@ -176,6 +207,7 @@ export default function ManageJob() {
               applications={applications}
               isUnlocked={isUnlocked}
               onStatusUpdate={updateApplicationStatus}
+              updatingStatus={updatingStatus}
             />
           </TabsContent>
 
@@ -184,6 +216,7 @@ export default function ManageJob() {
               applications={applications}
               isUnlocked={isUnlocked}
               onStatusUpdate={updateApplicationStatus}
+              updatingStatus={updatingStatus}
             />
           </TabsContent>
         </Tabs>
