@@ -1,8 +1,16 @@
 import React from 'react';
-import { Card, CardHeader, CardContent, CardTitle, CardDescription } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Card, CardHeader, CardContent, CardTitle, CardDescription } from '@/components/ui/card';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
+import { formatTimestamp } from '@/utils/timestamp';
 
 export default function PaymentHistory({ payments }) {
   const statusColors = {
@@ -29,19 +37,25 @@ export default function PaymentHistory({ payments }) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {payments.length > 0 ? payments.map(payment => (
-              <TableRow key={payment.id}>
-                <TableCell>{format(new Date(payment.created_date), 'MMM d, yyyy')}</TableCell>
-                <TableCell className="font-medium">{payment.job_title}</TableCell>
-                <TableCell>${payment.amount.toFixed(2)} {payment.currency}</TableCell>
-                <TableCell>
-                  <Badge className={statusColors[payment.status]}>{payment.status}</Badge>
-                </TableCell>
-                <TableCell className="text-xs text-gray-500">{payment.transaction_id}</TableCell>
-              </TableRow>
-            )) : (
+            {payments.length > 0 ? (
+              payments.map(payment => (
+                <TableRow key={payment.id}>
+                  <TableCell>{formatTimestamp(payment.created_date)}</TableCell>
+                  <TableCell className="font-medium">{payment.job_title}</TableCell>
+                  <TableCell>
+                    ${payment.amount.toFixed(2)} {payment.currency}
+                  </TableCell>
+                  <TableCell>
+                    <Badge className={statusColors[payment.status]}>{payment.status}</Badge>
+                  </TableCell>
+                  <TableCell className="text-gray-500 text-xs">{payment.paymentIntentId}</TableCell>
+                </TableRow>
+              ))
+            ) : (
               <TableRow>
-                <TableCell colSpan={5} className="text-center h-24">No payment history found.</TableCell>
+                <TableCell colSpan={5} className="h-24 text-center">
+                  No payment history found.
+                </TableCell>
               </TableRow>
             )}
           </TableBody>
